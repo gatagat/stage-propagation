@@ -1,0 +1,14 @@
+\cite{PLZ07} Automatic image analysis for gene expression patterns of fly embryos
+ - they search for clusters of genes with similar expression patterns 
+ - graph-based clustering
+ - image similarity
+
+
+Clustering-based methodology with minimal user supervision for displaying cell-phenotype signatures in image-based screening
+ - they select representatives
+ - clustering of different Golgi phenotypes
+
+
+Automatic Mining of Fruit Fly Embryo Images
+ - ISH Drosophila embryo images
+ - SVM and k-NN to recognize different annotation classes based on PCA and ICA projections

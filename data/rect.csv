@@ -1,0 +1,9 @@
+#mask_prefix: ~/projs/VT/experiments/e130117_iccv/data
+#stage_labels: {1: label1, 2: label2}
+#truth: stage
+#
+ID	mask	stage
+0	rect0.png	1
+1	rect1.png	2
+2	rect2.png	2
+3	rect3.png	2
