@@ -2,7 +2,6 @@
 
 import numpy as np
 import os
-import sys
 import tempfile
 
 import tsh; logger = tsh.create_logger(__name__)
@@ -44,7 +43,7 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--args', dest='args', required=False, action='store', default=None, help='Method arguments file.')
     parser.add_argument('-l', '--list', dest='list', required=True, action='store', default=None, help='List file.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
-    opts = parser.parse_args(sys.argv[1:])
+    opts = parser.parse_args()
     if opts.output == None:
         outdir = tempfile.mkdtemp(dir=os.curdir, prefix='out')
     else:

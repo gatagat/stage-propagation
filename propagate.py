@@ -1,6 +1,5 @@
 import numpy as np
 import os
-import sys; sys.path.insert(0, os.path.expanduser('~/projs/VT/experiments/'))
 import scipy as sp
 import tsh; logger = tsh.create_logger(__name__)
 from matplotlib.pylab import csv2rec
