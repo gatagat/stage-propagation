@@ -5,7 +5,7 @@ import os
 import tempfile
 
 import tsh; logger = tsh.create_logger(__name__)
-from utils import read_argsfile, read_listfile, write_featurefile
+from utils import read_argsfile, read_listfile, write_featurefile, clean_args
 from features_chaincode import get_chaincode_features, prepare_chaincode_features
 
 def get_pregenerated_features(sample, features=None, **kwargs):
@@ -32,6 +32,7 @@ def compute_features(method_name, method_args, data, output_dir=None):
     features = np.zeros((len(data), len(args['feature_names'])), dtype=np.float64)
     for i in range(len(data)):
         features[i, :] = compute_fn(data[i], cache=cache, **args)
+    args['feature_method'] = method_name
     return args, features
 
 
@@ -56,8 +57,5 @@ if __name__ == '__main__':
     if opts.args != None:
         args.update(read_argsfile(opts.args))
     args, features = compute_features(opts.method, args, data, output_dir=outdir)
-    args['feature_method'] = opts.method
-    for name in args['unserialized']:
-        del args[name]
-    del args['unserialized']
+    clean_args(args)
     write_featurefile(os.path.join(outdir, 'feats.csv'), data['id'], features, **args)

@@ -28,6 +28,12 @@ def read_listfile(filename):
     assert len(data) == len(np.unique(data['id']))
     return meta, data
 
+
+def read_truthfile(filename):
+    meta, data = read_listfile(filename)
+    return meta, data['id'].tolist(), data[meta['truth']]
+
+
 def read_argsfile(filename):
     """
     Reads in arguments from file.
@@ -39,12 +45,30 @@ def read_argsfile(filename):
     """
     return tsh.deserialize(filename)
 
-def _dump_meta(filename, meta):
-    with open(filename, 'w') as f:
+
+def read_featurefile(filename):
+    """
+    """
+    meta, features = read_listfile(filename)
+    feature_names = np.array(features.dtype.names)
+    feature_names = feature_names[feature_names != 'id'].tolist()
+    meta['feature_names'] = feature_names
+    return meta, features['id'].tolist(), features[feature_names].view(np.float64).reshape(len(features), -1)
+
+
+def _dump_meta(filespec, meta):
+    def dump_to_file_obj(f, meta):
         meta = yaml.dump(meta)
         meta = meta.split('\n')
         for line in meta:
             f.write('#%s\n' % line)
+
+    if isinstance(filespec, str):
+        with open(filespec, 'w') as f:
+            dump_to_file_obj(f, meta)
+    else:
+        dump_to_file_obj(filespec, meta)
+
 
 def write_featurefile(filename, sample_ids, features, feature_names=None, **kwargs):
     """
@@ -65,13 +89,28 @@ def write_featurefile(filename, sample_ids, features, feature_names=None, **kwar
     """
     assert feature_names != None
 
-    meta = kwargs.copy()
-    meta = yaml.dump(meta)
-    meta = meta.split('\n')
     with open(filename, 'w') as f:
-        for line in meta:
-            f.write('#%s\n' % line)
+        _dump_meta(f, kwargs)
         f.write('ID\t' + '\t'.join(feature_names) + '\n')
         for sample_id, feature in zip(sample_ids, features):
             f.write(str(sample_id) + '\t' + '\t'.join([str(v) for v in feature]) + '\n')
+
+def write_predfile(filename, sample_ids, pred, column_names=None, **kwargs):
+    assert column_names != None
+    with open(filename, 'w') as f:
+        _dump_meta(f, kwargs)
+        f.write('ID\t' + '\t'.join(column_names) + '\n')
+        for sample_id, feature in zip(sample_ids, pred):
+            f.write(str(sample_id) + '\t' + '\t'.join([str(v) for v in feature]) + '\n')
+
+def write_classifierfile(filename, classifier):
+    tsh.serialize(filename, classifier)
+
+def read_classifierfile(filename):
+    return tsh.deserialize(filename)
+
+def clean_args(args):
+    for name in args['unserialized']:
+        del args[name]
+    #del args['unserialized']
 

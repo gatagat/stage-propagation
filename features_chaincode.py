@@ -212,7 +212,8 @@ def prepare_chaincode_features(data, dictionary_name=None, bow_options_name=None
     assert dictionary_name != None
 
     bow_options = tsh.deserialize(bow_options_name)
-    dictionary_name = os.path.join(kwargs['output_dir'], dictionary_name)
+
+    dictionary_name = dictionary_name.format(OUT=kwargs['output_dir'])
     ret = { 'bow_options': bow_options, 'dictionary_name': dictionary_name }
     if os.path.exists(dictionary_name):
         ret.update(tsh.deserialize(dictionary_name))
