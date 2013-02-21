@@ -5,7 +5,7 @@ import os
 import tempfile
 
 import tsh; logger = tsh.create_logger(__name__)
-from utils import read_argsfile, read_listfile, write_featurefile, clean_args
+from utils import read_argsfile, read_listfile, write_listfile, clean_args
 from features_chaincode import get_chaincode_features, prepare_chaincode_features
 
 def get_pregenerated_features(sample, features=None, **kwargs):
@@ -28,10 +28,17 @@ def compute_features(method_name, method_args, data, output_dir=None):
     args = method_args.copy()
     additional_args = method_table[method_name]['prepare'](data, output_dir=output_dir, **args)
     args.update(additional_args)
+    feature_names = args['feature_names']
+    del args['feature_names']
     compute_fn = method_table[method_name]['function']
-    features = np.zeros((len(data), len(args['feature_names'])), dtype=np.float64)
-    for i in range(len(data)):
-        features[i, :] = compute_fn(data[i], cache=cache, **args)
+    N = len(data)
+    d = len(feature_names)
+    _f = np.zeros((N, d), dtype=np.float64)
+    for i in range(N):
+        _f[i, :] = compute_fn(data[i], cache=cache, **args)
+    features = np.core.records.fromarrays(
+            [data['id']] + [_f[:, i] for i in range(_f.shape[1])],
+            dtype=zip(['id'] + feature_names, [data.dtype['id']] + [np.float64] * d))
     args['feature_method'] = method_name
     return args, features
 
@@ -47,6 +54,7 @@ if __name__ == '__main__':
     opts = parser.parse_args()
     if opts.output == None:
         outdir = tempfile.mkdtemp(dir=os.curdir, prefix='out')
+        logger.info('Output directory %s', outdir)
     else:
         outdir = opts.output
         if not os.path.exists(outdir):
@@ -58,4 +66,4 @@ if __name__ == '__main__':
         args.update(read_argsfile(opts.args))
     args, features = compute_features(opts.method, args, data, output_dir=outdir)
     clean_args(args)
-    write_featurefile(os.path.join(outdir, 'feats.csv'), data['id'], features, **args)
+    write_listfile(os.path.join(outdir, 'feats.csv'), features, **args)

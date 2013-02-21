@@ -1,398 +1,399 @@
+#image_prefix: ~/tmp/Fine_Segmentation/MetaSys/20120907/013456~B/
 #mask_prefix: ~/tmp/Fine_Segmentation/MetaSys/20120907/013456~B/
-#stage_labels: {1: stg1-3, 4: stg11-12, 5: stg13-14, 6: stg15-16, 2: stg4-6, 3: stg7-8}
+#stage_labels: {1: stg1-3, 2: stg4-6, 3: stg7-8, 4: stg11-12, 5: stg13-14, 6: stg15-16}
 #truth: stage
 #
-ID	mask	stage
-2	obj0002-mask.png	2
-3	obj0003-mask.png	5
-4	obj0004-mask.png	5
-5	obj0005-mask.png	2
-8	obj0008-mask.png	6
-9	obj0009-mask.png	6
-11	obj0011-mask.png	5
-14	obj0014-mask.png	5
-15	obj0015-mask.png	6
-16	obj0016-mask.png	5
-17	obj0017-mask.png	4
-18	obj0018-mask.png	5
-19	obj0019-mask.png	6
-21	obj0021-mask.png	4
-22	obj0022-mask.png	6
-23	obj0023-mask.png	1
-24	obj0024-mask.png	5
-25	obj0025-mask.png	5
-26	obj0026-mask.png	6
-27	obj0027-mask.png	6
-28	obj0028-mask.png	5
-31	obj0031-mask.png	6
-32	obj0032-mask.png	5
-33	obj0033-mask.png	4
-34	obj0034-mask.png	6
-35	obj0035-mask.png	6
-36	obj0036-mask.png	5
-37	obj0037-mask.png	6
-38	obj0038-mask.png	5
-39	obj0039-mask.png	5
-40	obj0040-mask.png	5
-41	obj0041-mask.png	4
-42	obj0042-mask.png	4
-43	obj0043-mask.png	5
-44	obj0044-mask.png	5
-45	obj0045-mask.png	6
-46	obj0046-mask.png	6
-47	obj0047-mask.png	6
-48	obj0048-mask.png	4
-49	obj0049-mask.png	6
-50	obj0050-mask.png	2
-51	obj0051-mask.png	5
-52	obj0052-mask.png	3
-53	obj0053-mask.png	4
-54	obj0054-mask.png	6
-55	obj0055-mask.png	6
-56	obj0056-mask.png	4
-57	obj0057-mask.png	5
-58	obj0058-mask.png	6
-59	obj0059-mask.png	4
-60	obj0060-mask.png	5
-61	obj0061-mask.png	6
-63	obj0063-mask.png	5
-64	obj0064-mask.png	6
-65	obj0065-mask.png	5
-66	obj0066-mask.png	5
-67	obj0067-mask.png	4
-68	obj0068-mask.png	6
-69	obj0069-mask.png	4
-70	obj0070-mask.png	4
-71	obj0071-mask.png	6
-72	obj0072-mask.png	2
-73	obj0073-mask.png	5
-74	obj0074-mask.png	6
-75	obj0075-mask.png	6
-76	obj0076-mask.png	4
-77	obj0077-mask.png	4
-78	obj0078-mask.png	5
-79	obj0079-mask.png	6
-80	obj0080-mask.png	6
-82	obj0082-mask.png	6
-84	obj0084-mask.png	6
-86	obj0086-mask.png	4
-88	obj0088-mask.png	5
-89	obj0089-mask.png	6
-90	obj0090-mask.png	2
-91	obj0091-mask.png	5
-93	obj0093-mask.png	6
-94	obj0094-mask.png	5
-95	obj0095-mask.png	5
-96	obj0096-mask.png	1
-97	obj0097-mask.png	4
-98	obj0098-mask.png	5
-99	obj0099-mask.png	6
-100	obj0100-mask.png	6
-101	obj0101-mask.png	4
-102	obj0102-mask.png	6
-104	obj0104-mask.png	6
-105	obj0105-mask.png	6
-108	obj0108-mask.png	6
-109	obj0109-mask.png	5
-110	obj0110-mask.png	6
-112	obj0112-mask.png	6
-113	obj0113-mask.png	3
-114	obj0114-mask.png	5
-115	obj0115-mask.png	2
-116	obj0116-mask.png	5
-117	obj0117-mask.png	5
-118	obj0118-mask.png	4
-119	obj0119-mask.png	5
-120	obj0120-mask.png	4
-122	obj0122-mask.png	6
-123	obj0123-mask.png	3
-125	obj0125-mask.png	5
-126	obj0126-mask.png	2
-127	obj0127-mask.png	5
-128	obj0128-mask.png	5
-129	obj0129-mask.png	4
-130	obj0130-mask.png	4
-131	obj0131-mask.png	5
-132	obj0132-mask.png	6
-133	obj0133-mask.png	5
-134	obj0134-mask.png	5
-135	obj0135-mask.png	5
-136	obj0136-mask.png	4
-137	obj0137-mask.png	6
-138	obj0138-mask.png	5
-139	obj0139-mask.png	4
-140	obj0140-mask.png	6
-141	obj0141-mask.png	5
-142	obj0142-mask.png	2
-144	obj0144-mask.png	5
-147	obj0147-mask.png	5
-148	obj0148-mask.png	2
-149	obj0149-mask.png	4
-150	obj0150-mask.png	6
-151	obj0151-mask.png	4
-153	obj0153-mask.png	4
-154	obj0154-mask.png	6
-155	obj0155-mask.png	6
-159	obj0159-mask.png	5
-160	obj0160-mask.png	4
-161	obj0161-mask.png	6
-162	obj0162-mask.png	4
-163	obj0163-mask.png	5
-164	obj0164-mask.png	6
-165	obj0165-mask.png	5
-166	obj0166-mask.png	4
-167	obj0167-mask.png	3
-168	obj0168-mask.png	6
-169	obj0169-mask.png	5
-170	obj0170-mask.png	6
-171	obj0171-mask.png	5
-172	obj0172-mask.png	4
-174	obj0174-mask.png	5
-175	obj0175-mask.png	4
-176	obj0176-mask.png	2
-177	obj0177-mask.png	3
-178	obj0178-mask.png	4
-179	obj0179-mask.png	3
-180	obj0180-mask.png	4
-181	obj0181-mask.png	5
-182	obj0182-mask.png	6
-184	obj0184-mask.png	5
-185	obj0185-mask.png	5
-187	obj0187-mask.png	6
-188	obj0188-mask.png	4
-189	obj0189-mask.png	5
-192	obj0192-mask.png	6
-193	obj0193-mask.png	2
-194	obj0194-mask.png	6
-195	obj0195-mask.png	6
-197	obj0197-mask.png	4
-198	obj0198-mask.png	6
-201	obj0201-mask.png	6
-202	obj0202-mask.png	5
-203	obj0203-mask.png	4
-204	obj0204-mask.png	6
-205	obj0205-mask.png	5
-206	obj0206-mask.png	6
-207	obj0207-mask.png	4
-208	obj0208-mask.png	6
-209	obj0209-mask.png	5
-210	obj0210-mask.png	4
-211	obj0211-mask.png	1
-212	obj0212-mask.png	4
-213	obj0213-mask.png	2
-214	obj0214-mask.png	6
-215	obj0215-mask.png	5
-216	obj0216-mask.png	4
-217	obj0217-mask.png	3
-218	obj0218-mask.png	6
-219	obj0219-mask.png	5
-221	obj0221-mask.png	5
-222	obj0222-mask.png	5
-223	obj0223-mask.png	6
-224	obj0224-mask.png	5
-226	obj0226-mask.png	6
-227	obj0227-mask.png	4
-228	obj0228-mask.png	5
-229	obj0229-mask.png	5
-230	obj0230-mask.png	6
-231	obj0231-mask.png	5
-232	obj0232-mask.png	5
-233	obj0233-mask.png	4
-234	obj0234-mask.png	6
-235	obj0235-mask.png	6
-236	obj0236-mask.png	5
-237	obj0237-mask.png	2
-238	obj0238-mask.png	5
-239	obj0239-mask.png	4
-240	obj0240-mask.png	6
-241	obj0241-mask.png	4
-242	obj0242-mask.png	5
-243	obj0243-mask.png	4
-246	obj0246-mask.png	5
-247	obj0247-mask.png	5
-248	obj0248-mask.png	3
-250	obj0250-mask.png	4
-251	obj0251-mask.png	5
-252	obj0252-mask.png	6
-253	obj0253-mask.png	4
-255	obj0255-mask.png	4
-256	obj0256-mask.png	5
-259	obj0259-mask.png	6
-260	obj0260-mask.png	5
-261	obj0261-mask.png	4
-262	obj0262-mask.png	5
-263	obj0263-mask.png	5
-266	obj0266-mask.png	5
-267	obj0267-mask.png	2
-268	obj0268-mask.png	5
-269	obj0269-mask.png	4
-270	obj0270-mask.png	5
-272	obj0272-mask.png	4
-273	obj0273-mask.png	5
-274	obj0274-mask.png	5
-275	obj0275-mask.png	4
-276	obj0276-mask.png	6
-277	obj0277-mask.png	5
-278	obj0278-mask.png	6
-279	obj0279-mask.png	6
-280	obj0280-mask.png	6
-281	obj0281-mask.png	6
-282	obj0282-mask.png	4
-283	obj0283-mask.png	4
-284	obj0284-mask.png	4
-285	obj0285-mask.png	6
-286	obj0286-mask.png	6
-287	obj0287-mask.png	4
-288	obj0288-mask.png	5
-289	obj0289-mask.png	5
-290	obj0290-mask.png	4
-291	obj0291-mask.png	5
-293	obj0293-mask.png	6
-294	obj0294-mask.png	6
-295	obj0295-mask.png	4
-296	obj0296-mask.png	4
-298	obj0298-mask.png	5
-299	obj0299-mask.png	2
-300	obj0300-mask.png	5
-301	obj0301-mask.png	5
-302	obj0302-mask.png	5
-303	obj0303-mask.png	4
-304	obj0304-mask.png	6
-305	obj0305-mask.png	5
-306	obj0306-mask.png	4
-307	obj0307-mask.png	6
-308	obj0308-mask.png	5
-309	obj0309-mask.png	6
-310	obj0310-mask.png	5
-312	obj0312-mask.png	5
-313	obj0313-mask.png	6
-314	obj0314-mask.png	5
-316	obj0316-mask.png	6
-317	obj0317-mask.png	5
-318	obj0318-mask.png	6
-320	obj0320-mask.png	6
-321	obj0321-mask.png	6
-322	obj0322-mask.png	2
-324	obj0324-mask.png	6
-325	obj0325-mask.png	5
-326	obj0326-mask.png	5
-327	obj0327-mask.png	5
-328	obj0328-mask.png	4
-329	obj0329-mask.png	6
-331	obj0331-mask.png	4
-334	obj0334-mask.png	5
-335	obj0335-mask.png	6
-336	obj0336-mask.png	4
-337	obj0337-mask.png	6
-338	obj0338-mask.png	6
-340	obj0340-mask.png	4
-341	obj0341-mask.png	2
-342	obj0342-mask.png	4
-343	obj0343-mask.png	4
-344	obj0344-mask.png	6
-346	obj0346-mask.png	6
-347	obj0347-mask.png	6
-348	obj0348-mask.png	5
-349	obj0349-mask.png	4
-350	obj0350-mask.png	4
-352	obj0352-mask.png	4
-353	obj0353-mask.png	4
-354	obj0354-mask.png	5
-355	obj0355-mask.png	6
-356	obj0356-mask.png	5
-357	obj0357-mask.png	6
-358	obj0358-mask.png	4
-359	obj0359-mask.png	4
-360	obj0360-mask.png	4
-361	obj0361-mask.png	4
-366	obj0366-mask.png	3
-367	obj0367-mask.png	6
-368	obj0368-mask.png	5
-369	obj0369-mask.png	4
-371	obj0371-mask.png	5
-373	obj0373-mask.png	4
-375	obj0375-mask.png	5
-376	obj0376-mask.png	6
-377	obj0377-mask.png	6
-378	obj0378-mask.png	5
-379	obj0379-mask.png	5
-381	obj0381-mask.png	5
-382	obj0382-mask.png	1
-383	obj0383-mask.png	5
-384	obj0384-mask.png	5
-385	obj0385-mask.png	5
-386	obj0386-mask.png	5
-387	obj0387-mask.png	4
-388	obj0388-mask.png	5
-389	obj0389-mask.png	4
-390	obj0390-mask.png	6
-391	obj0391-mask.png	5
-392	obj0392-mask.png	4
-393	obj0393-mask.png	5
-394	obj0394-mask.png	6
-395	obj0395-mask.png	6
-396	obj0396-mask.png	6
-397	obj0397-mask.png	6
-398	obj0398-mask.png	6
-399	obj0399-mask.png	6
-400	obj0400-mask.png	5
-401	obj0401-mask.png	1
-402	obj0402-mask.png	6
-403	obj0403-mask.png	5
-404	obj0404-mask.png	6
-405	obj0405-mask.png	5
-406	obj0406-mask.png	4
-407	obj0407-mask.png	3
-408	obj0408-mask.png	5
-409	obj0409-mask.png	2
-410	obj0410-mask.png	6
-411	obj0411-mask.png	5
-412	obj0412-mask.png	5
-413	obj0413-mask.png	5
-414	obj0414-mask.png	5
-416	obj0416-mask.png	6
-418	obj0418-mask.png	5
-419	obj0419-mask.png	5
-420	obj0420-mask.png	5
-421	obj0421-mask.png	5
-422	obj0422-mask.png	5
-423	obj0423-mask.png	4
-425	obj0425-mask.png	6
-427	obj0427-mask.png	6
-428	obj0428-mask.png	4
-429	obj0429-mask.png	5
-431	obj0431-mask.png	5
-432	obj0432-mask.png	4
-433	obj0433-mask.png	3
-437	obj0437-mask.png	5
-438	obj0438-mask.png	4
-440	obj0440-mask.png	5
-441	obj0441-mask.png	5
-442	obj0442-mask.png	5
-443	obj0443-mask.png	5
-444	obj0444-mask.png	4
-445	obj0445-mask.png	4
-446	obj0446-mask.png	4
-447	obj0447-mask.png	5
-448	obj0448-mask.png	6
-449	obj0449-mask.png	6
-450	obj0450-mask.png	5
-451	obj0451-mask.png	5
-452	obj0452-mask.png	4
-453	obj0453-mask.png	3
-454	obj0454-mask.png	6
-455	obj0455-mask.png	4
-457	obj0457-mask.png	6
-458	obj0458-mask.png	3
-459	obj0459-mask.png	1
-460	obj0460-mask.png	6
-461	obj0461-mask.png	2
-462	obj0462-mask.png	4
-463	obj0463-mask.png	1
-464	obj0464-mask.png	6
-469	obj0469-mask.png	4
-470	obj0470-mask.png	6
-471	obj0471-mask.png	2
-472	obj0472-mask.png	3
-474	obj0474-mask.png	6
-475	obj0475-mask.png	2
+id	mask	image	stage
+2	obj0002-mask.png	obj0002-bri.png	2
+3	obj0003-mask.png	obj0003-bri.png	5
+4	obj0004-mask.png	obj0004-bri.png	5
+5	obj0005-mask.png	obj0005-bri.png	2
+8	obj0008-mask.png	obj0008-bri.png	6
+9	obj0009-mask.png	obj0009-bri.png	6
+11	obj0011-mask.png	obj0011-bri.png	5
+14	obj0014-mask.png	obj0014-bri.png	5
+15	obj0015-mask.png	obj0015-bri.png	6
+16	obj0016-mask.png	obj0016-bri.png	5
+17	obj0017-mask.png	obj0017-bri.png	4
+18	obj0018-mask.png	obj0018-bri.png	5
+19	obj0019-mask.png	obj0019-bri.png	6
+21	obj0021-mask.png	obj0021-bri.png	4
+22	obj0022-mask.png	obj0022-bri.png	6
+23	obj0023-mask.png	obj0023-bri.png	1
+24	obj0024-mask.png	obj0024-bri.png	5
+25	obj0025-mask.png	obj0025-bri.png	5
+26	obj0026-mask.png	obj0026-bri.png	6
+27	obj0027-mask.png	obj0027-bri.png	6
+28	obj0028-mask.png	obj0028-bri.png	5
+31	obj0031-mask.png	obj0031-bri.png	6
+32	obj0032-mask.png	obj0032-bri.png	5
+33	obj0033-mask.png	obj0033-bri.png	4
+34	obj0034-mask.png	obj0034-bri.png	6
+35	obj0035-mask.png	obj0035-bri.png	6
+36	obj0036-mask.png	obj0036-bri.png	5
+37	obj0037-mask.png	obj0037-bri.png	6
+38	obj0038-mask.png	obj0038-bri.png	5
+39	obj0039-mask.png	obj0039-bri.png	5
+40	obj0040-mask.png	obj0040-bri.png	5
+41	obj0041-mask.png	obj0041-bri.png	4
+42	obj0042-mask.png	obj0042-bri.png	4
+43	obj0043-mask.png	obj0043-bri.png	5
+44	obj0044-mask.png	obj0044-bri.png	5
+45	obj0045-mask.png	obj0045-bri.png	6
+46	obj0046-mask.png	obj0046-bri.png	6
+47	obj0047-mask.png	obj0047-bri.png	6
+48	obj0048-mask.png	obj0048-bri.png	4
+49	obj0049-mask.png	obj0049-bri.png	6
+50	obj0050-mask.png	obj0050-bri.png	2
+51	obj0051-mask.png	obj0051-bri.png	5
+52	obj0052-mask.png	obj0052-bri.png	3
+53	obj0053-mask.png	obj0053-bri.png	4
+54	obj0054-mask.png	obj0054-bri.png	6
+55	obj0055-mask.png	obj0055-bri.png	6
+56	obj0056-mask.png	obj0056-bri.png	4
+57	obj0057-mask.png	obj0057-bri.png	5
+58	obj0058-mask.png	obj0058-bri.png	6
+59	obj0059-mask.png	obj0059-bri.png	4
+60	obj0060-mask.png	obj0060-bri.png	5
+61	obj0061-mask.png	obj0061-bri.png	6
+63	obj0063-mask.png	obj0063-bri.png	5
+64	obj0064-mask.png	obj0064-bri.png	6
+65	obj0065-mask.png	obj0065-bri.png	5
+66	obj0066-mask.png	obj0066-bri.png	5
+67	obj0067-mask.png	obj0067-bri.png	4
+68	obj0068-mask.png	obj0068-bri.png	6
+69	obj0069-mask.png	obj0069-bri.png	4
+70	obj0070-mask.png	obj0070-bri.png	4
+71	obj0071-mask.png	obj0071-bri.png	6
+72	obj0072-mask.png	obj0072-bri.png	2
+73	obj0073-mask.png	obj0073-bri.png	5
+74	obj0074-mask.png	obj0074-bri.png	6
+75	obj0075-mask.png	obj0075-bri.png	6
+76	obj0076-mask.png	obj0076-bri.png	4
+77	obj0077-mask.png	obj0077-bri.png	4
+78	obj0078-mask.png	obj0078-bri.png	5
+79	obj0079-mask.png	obj0079-bri.png	6
+80	obj0080-mask.png	obj0080-bri.png	6
+82	obj0082-mask.png	obj0082-bri.png	6
+84	obj0084-mask.png	obj0084-bri.png	6
+86	obj0086-mask.png	obj0086-bri.png	4
+88	obj0088-mask.png	obj0088-bri.png	5
+89	obj0089-mask.png	obj0089-bri.png	6
+90	obj0090-mask.png	obj0090-bri.png	2
+91	obj0091-mask.png	obj0091-bri.png	5
+93	obj0093-mask.png	obj0093-bri.png	6
+94	obj0094-mask.png	obj0094-bri.png	5
+95	obj0095-mask.png	obj0095-bri.png	5
+96	obj0096-mask.png	obj0096-bri.png	1
+97	obj0097-mask.png	obj0097-bri.png	4
+98	obj0098-mask.png	obj0098-bri.png	5
+99	obj0099-mask.png	obj0099-bri.png	6
+100	obj0100-mask.png	obj0100-bri.png	6
+101	obj0101-mask.png	obj0101-bri.png	4
+102	obj0102-mask.png	obj0102-bri.png	6
+104	obj0104-mask.png	obj0104-bri.png	6
+105	obj0105-mask.png	obj0105-bri.png	6
+108	obj0108-mask.png	obj0108-bri.png	6
+109	obj0109-mask.png	obj0109-bri.png	5
+110	obj0110-mask.png	obj0110-bri.png	6
+112	obj0112-mask.png	obj0112-bri.png	6
+113	obj0113-mask.png	obj0113-bri.png	3
+114	obj0114-mask.png	obj0114-bri.png	5
+115	obj0115-mask.png	obj0115-bri.png	2
+116	obj0116-mask.png	obj0116-bri.png	5
+117	obj0117-mask.png	obj0117-bri.png	5
+118	obj0118-mask.png	obj0118-bri.png	4
+119	obj0119-mask.png	obj0119-bri.png	5
+120	obj0120-mask.png	obj0120-bri.png	4
+122	obj0122-mask.png	obj0122-bri.png	6
+123	obj0123-mask.png	obj0123-bri.png	3
+125	obj0125-mask.png	obj0125-bri.png	5
+126	obj0126-mask.png	obj0126-bri.png	2
+127	obj0127-mask.png	obj0127-bri.png	5
+128	obj0128-mask.png	obj0128-bri.png	5
+129	obj0129-mask.png	obj0129-bri.png	4
+130	obj0130-mask.png	obj0130-bri.png	4
+131	obj0131-mask.png	obj0131-bri.png	5
+132	obj0132-mask.png	obj0132-bri.png	6
+133	obj0133-mask.png	obj0133-bri.png	5
+134	obj0134-mask.png	obj0134-bri.png	5
+135	obj0135-mask.png	obj0135-bri.png	5
+136	obj0136-mask.png	obj0136-bri.png	4
+137	obj0137-mask.png	obj0137-bri.png	6
+138	obj0138-mask.png	obj0138-bri.png	5
+139	obj0139-mask.png	obj0139-bri.png	4
+140	obj0140-mask.png	obj0140-bri.png	6
+141	obj0141-mask.png	obj0141-bri.png	5
+142	obj0142-mask.png	obj0142-bri.png	2
+144	obj0144-mask.png	obj0144-bri.png	5
+147	obj0147-mask.png	obj0147-bri.png	5
+148	obj0148-mask.png	obj0148-bri.png	2
+149	obj0149-mask.png	obj0149-bri.png	4
+150	obj0150-mask.png	obj0150-bri.png	6
+151	obj0151-mask.png	obj0151-bri.png	4
+153	obj0153-mask.png	obj0153-bri.png	4
+154	obj0154-mask.png	obj0154-bri.png	6
+155	obj0155-mask.png	obj0155-bri.png	6
+159	obj0159-mask.png	obj0159-bri.png	5
+160	obj0160-mask.png	obj0160-bri.png	4
+161	obj0161-mask.png	obj0161-bri.png	6
+162	obj0162-mask.png	obj0162-bri.png	4
+163	obj0163-mask.png	obj0163-bri.png	5
+164	obj0164-mask.png	obj0164-bri.png	6
+165	obj0165-mask.png	obj0165-bri.png	5
+166	obj0166-mask.png	obj0166-bri.png	4
+167	obj0167-mask.png	obj0167-bri.png	3
+168	obj0168-mask.png	obj0168-bri.png	6
+169	obj0169-mask.png	obj0169-bri.png	5
+170	obj0170-mask.png	obj0170-bri.png	6
+171	obj0171-mask.png	obj0171-bri.png	5
+172	obj0172-mask.png	obj0172-bri.png	4
+174	obj0174-mask.png	obj0174-bri.png	5
+175	obj0175-mask.png	obj0175-bri.png	4
+176	obj0176-mask.png	obj0176-bri.png	2
+177	obj0177-mask.png	obj0177-bri.png	3
+178	obj0178-mask.png	obj0178-bri.png	4
+179	obj0179-mask.png	obj0179-bri.png	3
+180	obj0180-mask.png	obj0180-bri.png	4
+181	obj0181-mask.png	obj0181-bri.png	5
+182	obj0182-mask.png	obj0182-bri.png	6
+184	obj0184-mask.png	obj0184-bri.png	5
+185	obj0185-mask.png	obj0185-bri.png	5
+187	obj0187-mask.png	obj0187-bri.png	6
+188	obj0188-mask.png	obj0188-bri.png	4
+189	obj0189-mask.png	obj0189-bri.png	5
+192	obj0192-mask.png	obj0192-bri.png	6
+193	obj0193-mask.png	obj0193-bri.png	2
+194	obj0194-mask.png	obj0194-bri.png	6
+195	obj0195-mask.png	obj0195-bri.png	6
+197	obj0197-mask.png	obj0197-bri.png	4
+198	obj0198-mask.png	obj0198-bri.png	6
+201	obj0201-mask.png	obj0201-bri.png	6
+202	obj0202-mask.png	obj0202-bri.png	5
+203	obj0203-mask.png	obj0203-bri.png	4
+204	obj0204-mask.png	obj0204-bri.png	6
+205	obj0205-mask.png	obj0205-bri.png	5
+206	obj0206-mask.png	obj0206-bri.png	6
+207	obj0207-mask.png	obj0207-bri.png	4
+208	obj0208-mask.png	obj0208-bri.png	6
+209	obj0209-mask.png	obj0209-bri.png	5
+210	obj0210-mask.png	obj0210-bri.png	4
+211	obj0211-mask.png	obj0211-bri.png	1
+212	obj0212-mask.png	obj0212-bri.png	4
+213	obj0213-mask.png	obj0213-bri.png	2
+214	obj0214-mask.png	obj0214-bri.png	6
+215	obj0215-mask.png	obj0215-bri.png	5
+216	obj0216-mask.png	obj0216-bri.png	4
+217	obj0217-mask.png	obj0217-bri.png	3
+218	obj0218-mask.png	obj0218-bri.png	6
+219	obj0219-mask.png	obj0219-bri.png	5
+221	obj0221-mask.png	obj0221-bri.png	5
+222	obj0222-mask.png	obj0222-bri.png	5
+223	obj0223-mask.png	obj0223-bri.png	6
+224	obj0224-mask.png	obj0224-bri.png	5
+226	obj0226-mask.png	obj0226-bri.png	6
+227	obj0227-mask.png	obj0227-bri.png	4
+228	obj0228-mask.png	obj0228-bri.png	5
+229	obj0229-mask.png	obj0229-bri.png	5
+230	obj0230-mask.png	obj0230-bri.png	6
+231	obj0231-mask.png	obj0231-bri.png	5
+232	obj0232-mask.png	obj0232-bri.png	5
+233	obj0233-mask.png	obj0233-bri.png	4
+234	obj0234-mask.png	obj0234-bri.png	6
+235	obj0235-mask.png	obj0235-bri.png	6
+236	obj0236-mask.png	obj0236-bri.png	5
+237	obj0237-mask.png	obj0237-bri.png	2
+238	obj0238-mask.png	obj0238-bri.png	5
+239	obj0239-mask.png	obj0239-bri.png	4
+240	obj0240-mask.png	obj0240-bri.png	6
+241	obj0241-mask.png	obj0241-bri.png	4
+242	obj0242-mask.png	obj0242-bri.png	5
+243	obj0243-mask.png	obj0243-bri.png	4
+246	obj0246-mask.png	obj0246-bri.png	5
+247	obj0247-mask.png	obj0247-bri.png	5
+248	obj0248-mask.png	obj0248-bri.png	3
+250	obj0250-mask.png	obj0250-bri.png	4
+251	obj0251-mask.png	obj0251-bri.png	5
+252	obj0252-mask.png	obj0252-bri.png	6
+253	obj0253-mask.png	obj0253-bri.png	4
+255	obj0255-mask.png	obj0255-bri.png	4
+256	obj0256-mask.png	obj0256-bri.png	5
+259	obj0259-mask.png	obj0259-bri.png	6
+260	obj0260-mask.png	obj0260-bri.png	5
+261	obj0261-mask.png	obj0261-bri.png	4
+262	obj0262-mask.png	obj0262-bri.png	5
+263	obj0263-mask.png	obj0263-bri.png	5
+266	obj0266-mask.png	obj0266-bri.png	5
+267	obj0267-mask.png	obj0267-bri.png	2
+268	obj0268-mask.png	obj0268-bri.png	5
+269	obj0269-mask.png	obj0269-bri.png	4
+270	obj0270-mask.png	obj0270-bri.png	5
+272	obj0272-mask.png	obj0272-bri.png	4
+273	obj0273-mask.png	obj0273-bri.png	5
+274	obj0274-mask.png	obj0274-bri.png	5
+275	obj0275-mask.png	obj0275-bri.png	4
+276	obj0276-mask.png	obj0276-bri.png	6
+277	obj0277-mask.png	obj0277-bri.png	5
+278	obj0278-mask.png	obj0278-bri.png	6
+279	obj0279-mask.png	obj0279-bri.png	6
+280	obj0280-mask.png	obj0280-bri.png	6
+281	obj0281-mask.png	obj0281-bri.png	6
+282	obj0282-mask.png	obj0282-bri.png	4
+283	obj0283-mask.png	obj0283-bri.png	4
+284	obj0284-mask.png	obj0284-bri.png	4
+285	obj0285-mask.png	obj0285-bri.png	6
+286	obj0286-mask.png	obj0286-bri.png	6
+287	obj0287-mask.png	obj0287-bri.png	4
+288	obj0288-mask.png	obj0288-bri.png	5
+289	obj0289-mask.png	obj0289-bri.png	5
+290	obj0290-mask.png	obj0290-bri.png	4
+291	obj0291-mask.png	obj0291-bri.png	5
+293	obj0293-mask.png	obj0293-bri.png	6
+294	obj0294-mask.png	obj0294-bri.png	6
+295	obj0295-mask.png	obj0295-bri.png	4
+296	obj0296-mask.png	obj0296-bri.png	4
+298	obj0298-mask.png	obj0298-bri.png	5
+299	obj0299-mask.png	obj0299-bri.png	2
+300	obj0300-mask.png	obj0300-bri.png	5
+301	obj0301-mask.png	obj0301-bri.png	5
+302	obj0302-mask.png	obj0302-bri.png	5
+303	obj0303-mask.png	obj0303-bri.png	4
+304	obj0304-mask.png	obj0304-bri.png	6
+305	obj0305-mask.png	obj0305-bri.png	5
+306	obj0306-mask.png	obj0306-bri.png	4
+307	obj0307-mask.png	obj0307-bri.png	6
+308	obj0308-mask.png	obj0308-bri.png	5
+309	obj0309-mask.png	obj0309-bri.png	6
+310	obj0310-mask.png	obj0310-bri.png	5
+312	obj0312-mask.png	obj0312-bri.png	5
+313	obj0313-mask.png	obj0313-bri.png	6
+314	obj0314-mask.png	obj0314-bri.png	5
+316	obj0316-mask.png	obj0316-bri.png	6
+317	obj0317-mask.png	obj0317-bri.png	5
+318	obj0318-mask.png	obj0318-bri.png	6
+320	obj0320-mask.png	obj0320-bri.png	6
+321	obj0321-mask.png	obj0321-bri.png	6
+322	obj0322-mask.png	obj0322-bri.png	2
+324	obj0324-mask.png	obj0324-bri.png	6
+325	obj0325-mask.png	obj0325-bri.png	5
+326	obj0326-mask.png	obj0326-bri.png	5
+327	obj0327-mask.png	obj0327-bri.png	5
+328	obj0328-mask.png	obj0328-bri.png	4
+329	obj0329-mask.png	obj0329-bri.png	6
+331	obj0331-mask.png	obj0331-bri.png	4
+334	obj0334-mask.png	obj0334-bri.png	5
+335	obj0335-mask.png	obj0335-bri.png	6
+336	obj0336-mask.png	obj0336-bri.png	4
+337	obj0337-mask.png	obj0337-bri.png	6
+338	obj0338-mask.png	obj0338-bri.png	6
+340	obj0340-mask.png	obj0340-bri.png	4
+341	obj0341-mask.png	obj0341-bri.png	2
+342	obj0342-mask.png	obj0342-bri.png	4
+343	obj0343-mask.png	obj0343-bri.png	4
+344	obj0344-mask.png	obj0344-bri.png	6
+346	obj0346-mask.png	obj0346-bri.png	6
+347	obj0347-mask.png	obj0347-bri.png	6
+348	obj0348-mask.png	obj0348-bri.png	5
+349	obj0349-mask.png	obj0349-bri.png	4
+350	obj0350-mask.png	obj0350-bri.png	4
+352	obj0352-mask.png	obj0352-bri.png	4
+353	obj0353-mask.png	obj0353-bri.png	4
+354	obj0354-mask.png	obj0354-bri.png	5
+355	obj0355-mask.png	obj0355-bri.png	6
+356	obj0356-mask.png	obj0356-bri.png	5
+357	obj0357-mask.png	obj0357-bri.png	6
+358	obj0358-mask.png	obj0358-bri.png	4
+359	obj0359-mask.png	obj0359-bri.png	4
+360	obj0360-mask.png	obj0360-bri.png	4
+361	obj0361-mask.png	obj0361-bri.png	4
+366	obj0366-mask.png	obj0366-bri.png	3
+367	obj0367-mask.png	obj0367-bri.png	6
+368	obj0368-mask.png	obj0368-bri.png	5
+369	obj0369-mask.png	obj0369-bri.png	4
+371	obj0371-mask.png	obj0371-bri.png	5
+373	obj0373-mask.png	obj0373-bri.png	4
+375	obj0375-mask.png	obj0375-bri.png	5
+376	obj0376-mask.png	obj0376-bri.png	6
+377	obj0377-mask.png	obj0377-bri.png	6
+378	obj0378-mask.png	obj0378-bri.png	5
+379	obj0379-mask.png	obj0379-bri.png	5
+381	obj0381-mask.png	obj0381-bri.png	5
+382	obj0382-mask.png	obj0382-bri.png	1
+383	obj0383-mask.png	obj0383-bri.png	5
+384	obj0384-mask.png	obj0384-bri.png	5
+385	obj0385-mask.png	obj0385-bri.png	5
+386	obj0386-mask.png	obj0386-bri.png	5
+387	obj0387-mask.png	obj0387-bri.png	4
+388	obj0388-mask.png	obj0388-bri.png	5
+389	obj0389-mask.png	obj0389-bri.png	4
+390	obj0390-mask.png	obj0390-bri.png	6
+391	obj0391-mask.png	obj0391-bri.png	5
+392	obj0392-mask.png	obj0392-bri.png	4
+393	obj0393-mask.png	obj0393-bri.png	5
+394	obj0394-mask.png	obj0394-bri.png	6
+395	obj0395-mask.png	obj0395-bri.png	6
+396	obj0396-mask.png	obj0396-bri.png	6
+397	obj0397-mask.png	obj0397-bri.png	6
+398	obj0398-mask.png	obj0398-bri.png	6
+399	obj0399-mask.png	obj0399-bri.png	6
+400	obj0400-mask.png	obj0400-bri.png	5
+401	obj0401-mask.png	obj0401-bri.png	1
+402	obj0402-mask.png	obj0402-bri.png	6
+403	obj0403-mask.png	obj0403-bri.png	5
+404	obj0404-mask.png	obj0404-bri.png	6
+405	obj0405-mask.png	obj0405-bri.png	5
+406	obj0406-mask.png	obj0406-bri.png	4
+407	obj0407-mask.png	obj0407-bri.png	3
+408	obj0408-mask.png	obj0408-bri.png	5
+409	obj0409-mask.png	obj0409-bri.png	2
+410	obj0410-mask.png	obj0410-bri.png	6
+411	obj0411-mask.png	obj0411-bri.png	5
+412	obj0412-mask.png	obj0412-bri.png	5
+413	obj0413-mask.png	obj0413-bri.png	5
+414	obj0414-mask.png	obj0414-bri.png	5
+416	obj0416-mask.png	obj0416-bri.png	6
+418	obj0418-mask.png	obj0418-bri.png	5
+419	obj0419-mask.png	obj0419-bri.png	5
+420	obj0420-mask.png	obj0420-bri.png	5
+421	obj0421-mask.png	obj0421-bri.png	5
+422	obj0422-mask.png	obj0422-bri.png	5
+423	obj0423-mask.png	obj0423-bri.png	4
+425	obj0425-mask.png	obj0425-bri.png	6
+427	obj0427-mask.png	obj0427-bri.png	6
+428	obj0428-mask.png	obj0428-bri.png	4
+429	obj0429-mask.png	obj0429-bri.png	5
+431	obj0431-mask.png	obj0431-bri.png	5
+432	obj0432-mask.png	obj0432-bri.png	4
+433	obj0433-mask.png	obj0433-bri.png	3
+437	obj0437-mask.png	obj0437-bri.png	5
+438	obj0438-mask.png	obj0438-bri.png	4
+440	obj0440-mask.png	obj0440-bri.png	5
+441	obj0441-mask.png	obj0441-bri.png	5
+442	obj0442-mask.png	obj0442-bri.png	5
+443	obj0443-mask.png	obj0443-bri.png	5
+444	obj0444-mask.png	obj0444-bri.png	4
+445	obj0445-mask.png	obj0445-bri.png	4
+446	obj0446-mask.png	obj0446-bri.png	4
+447	obj0447-mask.png	obj0447-bri.png	5
+448	obj0448-mask.png	obj0448-bri.png	6
+449	obj0449-mask.png	obj0449-bri.png	6
+450	obj0450-mask.png	obj0450-bri.png	5
+451	obj0451-mask.png	obj0451-bri.png	5
+452	obj0452-mask.png	obj0452-bri.png	4
+453	obj0453-mask.png	obj0453-bri.png	3
+454	obj0454-mask.png	obj0454-bri.png	6
+455	obj0455-mask.png	obj0455-bri.png	4
+457	obj0457-mask.png	obj0457-bri.png	6
+458	obj0458-mask.png	obj0458-bri.png	3
+459	obj0459-mask.png	obj0459-bri.png	1
+460	obj0460-mask.png	obj0460-bri.png	6
+461	obj0461-mask.png	obj0461-bri.png	2
+462	obj0462-mask.png	obj0462-bri.png	4
+463	obj0463-mask.png	obj0463-bri.png	1
+464	obj0464-mask.png	obj0464-bri.png	6
+469	obj0469-mask.png	obj0469-bri.png	4
+470	obj0470-mask.png	obj0470-bri.png	6
+471	obj0471-mask.png	obj0471-bri.png	2
+472	obj0472-mask.png	obj0472-bri.png	3
+474	obj0474-mask.png	obj0474-bri.png	6
+475	obj0475-mask.png	obj0475-bri.png	2

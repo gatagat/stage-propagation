@@ -31,7 +31,7 @@ The file can contain any number of other columns. A truth file is just a list fi
 	002 dir2/file002.png	2
 	003 anotherdir/file003.png	1
 
-### Feature file
+### Feature file and weights file
 
 A feature file is a CSV table of the following form:
 
@@ -46,6 +46,14 @@ A feature file is a CSV table of the following form:
 
 Column `ID` should match with the corresponding list file, all other columns are considered to be features.
 
+A weights file is a feature file with a square matrix of weights saved as features and indexed by sample IDs:
+
+	#methodname=...
+	ID	001	002	003	…
+	001 2.	.4	-1	…
+	002	3.  .5  .1	…
+	003 2.	.7	-2	…
+
 ### Classifier file
 
 A pickled (serialized) bzip2-compressed Python dictionary with the following entries:
@@ -58,7 +66,8 @@ A pickled (serialized) bzip2-compressed Python dictionary with the following ent
 
 ### Prediction file
 
-A prediction file is a truth file with additional columns: `pred` with the predicted class and `prob_N` with probability of the class `N`.
+A prediction file is a truth file with additional columns: `pred` with the predicted class and `probN` with probability of the class `N`.
+
 
 ### Evaluation file
 
@@ -103,32 +112,34 @@ Loads an existing classifier and applies it to the data. Outputs predictions.
 
 Command-line interface:
 
-	predict.py -l listfile -c classifierfile
+	predict.py -l listfile -m classifierfile
 
-It creates a file `pred.csv`.
+It creates a prediction file `pred.csv`.
 
 ## Label propagation
 
-* `similarity.py` - computes similarity of pairs of input data
-* `propagate.py` - propagates labels from a classifier using similarities
+* `weights.py` - computes weights of edges between data samples
+* `propagate.py` - propagates labels from a classifier using weights
 * `evaluate.py` - evaluates propagated labels using ground truth
 
 
-### similarity.py
+### weights.py
 
-Evaluates a similarity of all the sample pairs and saves the resulting symmetric matrix. Defines a function `compute_similarity(method_name, method_args, data)`.
+Evaluates a mutual distances/dissimilarities between all the sample pairs and uses the distances to setup edge weights for the label propagation. Defines a function `compute_weights(method_name, method_args, data)`.
 
 Command-line interface:
 
-	similarity.py -m method_name -a argsfile -l listfile
+	weights.py -m method_name -a argsfile -l listfile
 
-It creates a file `similarity.csv`.
+It creates a weights file `weights.csv`.
 
 ### propagate.py
 
+Propagates labels according to predictions for different samples and according to the edge weights computed by `weights.py`. Defines a function `propagate(method_name, method_args, predictions, weights)`.
+
 Command-line interface:
 
-	propagate.py -l listfile -p predictionfile
+	propagate.py -m methodname -p predictionfile -w weightsfile
 
 It creates a prediction file `prop.csv`.
 

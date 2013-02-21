@@ -1,0 +1,10 @@
+#image_prefix: ~/tmp/Fine_Segmentation/MetaSys/20120907/013456~B/
+#mask_prefix: ~/tmp/Fine_Segmentation/MetaSys/20120907/013456~B/
+#stage_labels: {1: stg1-3, 2: stg4-6, 3: stg7-8, 4: stg11-12, 5: stg13-14, 6: stg15-16}
+#truth: stage
+#
+id	mask	image	stage
+2	obj0002-mask.png	obj0002-bri.png	2
+3	obj0003-mask.png	obj0003-bri.png	5
+4	obj0004-mask.png	obj0004-bri.png	5
+5	obj0005-mask.png	obj0005-bri.png	2

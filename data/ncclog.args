@@ -1,0 +1,6 @@
+distance_name: '{OUT}/distance.dat'
+measure: NCClog
+normalized_height: 64
+normalized_width: 128
+rotation_invariance: true
+unserialized: [truth, stage_labels]

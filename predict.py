@@ -5,19 +5,17 @@ import os
 import tempfile
 
 import tsh; logger = tsh.create_logger(__name__)
-from utils import read_listfile, read_classifierfile, write_featurefile, write_predfile, clean_args
+from utils import read_listfile, read_classifierfile, write_listfile, clean_args
 from features import compute_features
 
-def predict(model, features, output_dir=None):
-    pred = model.predict(features).astype(int)
-    if hasattr(model, 'predict_proba'):
-        proba = model.predict_proba(features)
-        n_classes = proba.shape[1]
-        ret = np.core.records.fromarrays(
-                [pred] + [proba[:, n].flat for n in range(n_classes)],
-                names=['pred'] + ['prob%d' % n for n in range(n_classes)])
-    else:
-        ret = np.core.records.fromarrays([pred], names=['pred'])
+def predict(model, classes, features, output_dir=None):
+    _f = features[[n for n in features.dtype.names if n != 'id']].view(np.float64).reshape(len(features), -1)
+    pred = model.predict(_f).astype(int)
+    proba = model.predict_proba(_f)
+    n_classes = proba.shape[1]
+    ret = np.core.records.fromarrays(
+            [features['id']] + [pred] + [proba[:, n].flat for n in range(n_classes)],
+            names=['id', 'pred'] + ['prob%d' % int(n) for n in classes])
     return ret
 
 if __name__ == '__main__':
@@ -40,8 +38,9 @@ if __name__ == '__main__':
     feature_method = classifier['features']['meta']['feature_method']
     feature_args = meta.copy()
     feature_args.update(classifier['features']['meta'])
-    feature_meta, features = compute_features(feature_method, feature_args, data, output_dir=outdir)
-    clean_args(feature_meta)
-    write_featurefile(os.path.join(outdir, 'feats-test.csv'), data['id'], features, **feature_meta)
-    pred = predict(classifier['classifier']['model'], features, output_dir=outdir)
-    write_predfile(os.path.join(outdir, 'prediction.csv'), data['id'], pred, column_names=pred.dtype.names, classifier_name=opts.model, labels=classifier['classifier']['labels']) 
+    args, features = compute_features(feature_method, feature_args, data, output_dir=outdir)
+    assert (data['id'] == features['id']).all()
+    clean_args(args)
+    write_listfile(os.path.join(outdir, 'feats-test.csv'), features, **args)
+    pred = predict(classifier['classifier']['model'], sorted(classifier['classifier']['labels'].keys()), features, output_dir=outdir)
+    write_listfile(os.path.join(outdir, 'prediction.csv'), pred, classifier_name=opts.model, labels=classifier['classifier']['labels'])
