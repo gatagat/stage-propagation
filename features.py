@@ -8,9 +8,9 @@ import tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, read_listfile, write_listfile, clean_args
 from features_chaincode import get_chaincode_features, prepare_chaincode_features
 
-def get_pregenerated_features(sample, features=None, **kwargs):
-    assert features is not None
-    return np.array([ sample[f] for f in features ], dtype=np.float64)
+def get_pregenerated_features(sample, feature_names=None, **kwargs):
+    assert feature_names is not None
+    return np.array([ sample[f] for f in feature_names ], dtype=np.float64)
 
 
 def prepare_pregenerated_features(data, features=None, **kwargs):
@@ -29,7 +29,7 @@ def compute_features(method_name, method_args, data, output_dir=None):
     additional_args = method_table[method_name]['prepare'](data, output_dir=output_dir, **args)
     args.update(additional_args)
     feature_names = args['feature_names']
-    del args['feature_names']
+    #del args['feature_names']
     compute_fn = method_table[method_name]['function']
     N = len(data)
     d = len(feature_names)

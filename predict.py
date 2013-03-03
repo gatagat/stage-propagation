@@ -12,10 +12,11 @@ def predict(model, classes, features, output_dir=None):
     _f = features[[n for n in features.dtype.names if n != 'id']].view(np.float64).reshape(len(features), -1)
     pred = model.predict(_f).astype(int)
     proba = model.predict_proba(_f)
+    pred_argmax = np.array(classes)[proba.argmax(axis=1)]
     n_classes = proba.shape[1]
     ret = np.core.records.fromarrays(
-            [features['id']] + [pred] + [proba[:, n].flat for n in range(n_classes)],
-            names=['id', 'pred'] + ['prob%d' % int(n) for n in classes])
+            [features['id']] + [pred, pred_argmax] + [proba[:, n].flat for n in range(n_classes)],
+            names=['id', 'pred', 'pred_argmax'] + ['prob%d' % int(n) for n in classes])
     return ret
 
 if __name__ == '__main__':
@@ -42,5 +43,7 @@ if __name__ == '__main__':
     assert (data['id'] == features['id']).all()
     clean_args(args)
     write_listfile(os.path.join(outdir, 'feats-test.csv'), features, **args)
-    pred = predict(classifier['classifier']['model'], sorted(classifier['classifier']['labels'].keys()), features, output_dir=outdir)
-    write_listfile(os.path.join(outdir, 'prediction.csv'), pred, classifier_name=opts.model, labels=classifier['classifier']['labels'])
+    labels_name = classifier['meta']['truth'] + '_labels'
+    labels = classifier['meta'][labels_name]
+    pred = predict(classifier['classifier'], sorted(labels.keys()), features, output_dir=outdir)
+    write_listfile(os.path.join(outdir, 'predictions.csv'), pred, classifier_name=opts.model, truth=classifier['meta']['truth'], labels_name=labels)

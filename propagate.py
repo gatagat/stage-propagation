@@ -15,7 +15,9 @@ method_table = {
 
 def propagate(method_name, method_args, predictions, weights, output_dir=None):
     args = method_args.copy()
-    propagated = method_table[method_name]['function'](predictions, weights, output_dir=output_dir, **args)
+    label_name = args['truth'] + '_labels'
+    labels = args[label_name]
+    propagated = method_table[method_name]['function'](predictions, weights, labels=labels, output_dir=output_dir, **args)
     args['propagate_method'] = method_name
     return args, propagated
 
@@ -47,4 +49,4 @@ if __name__ == '__main__':
         args.update(read_argsfile(opts.args))
     args, prop = propagate(opts.method, args, predictions, weights, output_dir=outdir)
     clean_args(args)
-    write_listfile(os.path.join(outdir, 'prop.csv'), prop, **args)
+    write_listfile(os.path.join(outdir, 'propagated.csv'), prop, **args)

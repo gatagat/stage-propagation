@@ -9,9 +9,10 @@ from utils import read_listfile, read_argsfile, clean_args, write_listfile
 from weights_expression import get_distances as get_distances_expression
 
 
-def get_pregenerated_feature_distances(data, features=None, **kwargs):
-    assert features is not None
-    return tsh.pdist2(data[features], distance=lambda a, b: (a.view(float) - b.view(float)) ** 2)
+def get_pregenerated_feature_distances(data, weight_names=None, **kwargs):
+    assert weight_names is not None
+    kwargs['weight_names'] = weight_names
+    return kwargs, tsh.pdist2(data[weight_names], distance=lambda a, b: (a.view(float) - b.view(float)) ** 2)
 
 
 method_table = {
@@ -28,10 +29,9 @@ def compute_weight_matrix(method_name, method_args, data, output_dir=None):
     D = np.exp(-D * distance_factor)
     D[np.diag_indices_from(D)] = 0.
     cols = [str(i) for i in data['id']]
-    W = np.zeros(len(D), dtype=[('id', data.dtype['id'])] +
-            zip(cols, [np.float64] * len(D)))
-    W['id'] = data['id']
-    W[cols] = D
+    W = np.core.records.fromarrays(
+            [data['id']] + [D[:, i] for i in range(D.shape[1])],
+            dtype=zip(['id'] + cols, [data.dtype['id']] + [np.float64] * len(cols)))
     return args, W
 
 

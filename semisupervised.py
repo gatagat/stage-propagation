@@ -4,7 +4,7 @@ import scipy.linalg
 
 from harmonic_function import harmonic_function
 
-def _solve_binary(labels, confidences, weights, mu=1e-2, eps=1e-1, **kwargs):
+def _solve_binary(labels, confidences, weights, unary_weight=1., smoothness_weight=1e-2, regularization_weight=1e-1, **kwargs):
     """
     Propagates binary labels in a graph specified by weights.
 
@@ -40,12 +40,11 @@ def _solve_binary(labels, confidences, weights, mu=1e-2, eps=1e-1, **kwargs):
     probability
         Probability of the positive class
     """
-    assert eps > 0
 
     n = len(weights)
     L = np.diag(weights.sum(axis=1)) - weights.astype(float)
     S = np.diag(confidences).astype(float)
-    M = S + mu*L + mu*eps*np.eye(n, dtype=float)
+    M = unary_weight*S + smoothness_weight*L + regularization_weight*np.eye(n, dtype=float)
     c, lower = sp.linalg.cho_factor(M)
     pred = sp.linalg.cho_solve((c, lower), np.dot(S, labels))
     return (pred + 1) / 2

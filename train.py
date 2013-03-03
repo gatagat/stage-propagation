@@ -10,44 +10,45 @@ import sys
 import tempfile
 
 import tsh; logger = tsh.create_logger(__name__)
-from utils import read_truthfile, read_featurefile, write_classifierfile
+from utils import read_argsfile, read_truthfile, read_featurefile, write_classifierfile
 
-def train_classifier(args, ids, features, target, truth_meta, output_dir=None):
-    labels = None
-    truth_name = truth_meta['truth']
-    label_name = truth_name + '_labels'
-    if label_name in truth_meta:
-        labels = truth_meta[label_name]
-        logger.info(dict(zip(labels.keys(), [ (np.array(target) == s).sum() for s in labels.keys() ])))
-    else:
-        labels = dict([ (t, str(t)) for t in np.unique(target) ])
+
+scoring_table = {
+        'accuracy': sklearn.metrics.zero_one_score
+        }
+
+
+def train_svm(ids, features, target, labels, balance=None, coarse_C=None, scoring=None, folds=None, output_dir=None, **kwargs):
+    assert coarse_C != None
+    assert balance != None
+    assert scoring != None
+    assert folds != None
 
     logger.info(Counter(target))
-    if 'balance' in args and args['balance'] != False:
-        if args['balance'] == True:
-            indices = np.sort(tsh.stratified_indices(target))
-        else:
-            indices = np.sort(tsh.stratified_indices(target, min_count=args['balance']))
-        features = features[indices]
-        target = target[indices]
-        logger.info(Counter(target))
+    if balance == False:
+        indices = np.arange(len(target))
+    elif balance == True:
+        indices = np.sort(tsh.stratified_indices(target))
     else:
-        indices = None
+        indices = np.sort(tsh.stratified_indices(target, min_count=balance))
+    features = features[indices]
+    target = target[indices]
+    logger.info(Counter(target))
 
     logger.info('SVM grid search...')
-    scoring = ('accuracy', sklearn.metrics.zero_one_score)
     class_weight = 'auto'
     logger.info('Coarse grid search')
-    coarse_C_range = (10. ** np.arange(-5, 10)).tolist()
     grid = sklearn.grid_search.GridSearchCV(
             #sklearn.svm.LinearSVC(class_weight=class_weight),
             sklearn.svm.SVC(class_weight=class_weight, kernel='linear', probability=False),
-            param_grid=dict(C=coarse_C_range),
-            score_func=scoring[1],
-            cv=sklearn.cross_validation.StratifiedKFold(y=target, k=5))
+            #n_jobs=4,
+            param_grid=dict(C=coarse_C),
+            score_func=scoring_table[scoring],
+            cv=sklearn.cross_validation.StratifiedKFold(y=target, k=folds))
     grid.fit(features, target)
     cv_score = grid.best_score_
-    logger.info('CV-score: %f', cv_score)
+    logger.info('Best C-parameter: %f', grid.best_estimator_.C)
+    logger.info('CV-score (%s): %f', scoring, cv_score)
 
     logger.info('Learning coarse SVM...')
     best_estimator = grid.best_estimator_
@@ -58,26 +59,38 @@ def train_classifier(args, ids, features, target, truth_meta, output_dir=None):
     pred = best_estimator.predict(features)
     train_confusion = sklearn.metrics.confusion_matrix(target, pred, labels=sorted(labels.keys()))
     train_accuracy = tsh.supervised_accuracy(target, pred)
-    logger.info('Coarse SVM C-parameter: %f', best_estimator.C)
-    logger.info('Coarse confusion (train): %s', train_confusion)
-    logger.info('Coarse accuracy (train): %s', train_accuracy)
+    logger.info('Confusion (train): %s', train_confusion)
+    logger.info('Accuracy (train): %s', train_accuracy)
 
-    return {
-            'model': best_estimator,
-            'indices': indices,
-            'truth': truth_name,
-            'labels': labels,
-            'scoring': scoring[0],
-            'cv_score': cv_score,
-            'confusion': train_confusion,
-            'accuracy': train_accuracy
-           }
+    args['indices'] = indices
+    args['cv_score'] = cv_score
+    args['train_confusion'] = train_confusion
+    args['train_accuracy'] = train_accuracy
+    return args, best_estimator
+
+
+method_table = {
+        'svm': { 'function': train_svm },
+        }
+
+
+def train_classifier(method_name, method_args, ids, features, target, output_dir=None):
+    args = method_args.copy()
+    labels = None
+    truth_name = args['truth']
+    label_name = truth_name + '_labels'
+    labels = args[label_name]
+    logger.info(dict(zip(labels.keys(), [ (np.array(target) == s).sum() for s in labels.keys() ])))
+    return method_table[method_name]['function'](ids, features, target, labels, output_dir=output_dir, **args)
+
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description='Computes features for all the input data.')
+    parser = argparse.ArgumentParser(description='Trains the classifier on all the given data.')
     parser.add_argument('-f', '--feature', dest='feature', required=True, action='store', default=False, help='Feature file.')
     parser.add_argument('-c', '--config', dest='config', required=False, action='store', default=None, help='Path to the config file.')
+    parser.add_argument('-m', '--method', dest='method', required=True, action='store', choices=method_table.keys(), default=None, help='Method name.')
+    parser.add_argument('-a', '--args', dest='args', required=False, action='store', default=None, help='Method arguments file.')
     parser.add_argument('-t', '--truth', dest='truth', required=True, action='store', default=None, help='Truth file.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
     opts = parser.parse_args(sys.argv[1:])
@@ -88,13 +101,17 @@ if __name__ == '__main__':
         if not os.path.exists(outdir):
             tsh.makedirs(outdir)
     config = tsh.read_config(opts, __file__)
-    args = { 'balance': 20 }
     truth_meta, truth_ids, target = read_truthfile(opts.truth)
     feature_meta, feature_ids, features = read_featurefile(opts.feature)
+    args = truth_meta
+    if opts.args != None:
+        args.update(read_argsfile(opts.args))
     assert (np.array(feature_ids) == np.array(truth_ids)).all()
-    classifier = {
-            'classifier': train_classifier(args, truth_ids, features, target, truth_meta, output_dir=outdir),
-            'truth': { 'ids': truth_ids, 'target': target },
-            'features': { 'meta': feature_meta, 'data': features }
+    classifier_meta, classifier = train_classifier(opts.method, args, truth_ids, features, target, output_dir=outdir)
+    data = {
+            'classifier': classifier,
+            'meta': classifier_meta,
+            'truth': { 'meta': truth_meta, 'ids': truth_ids, 'target': target },
+            'features': { 'meta': feature_meta, 'ids': feature_ids, 'data': features }
             }
-    write_classifierfile(os.path.join(outdir, 'classifier.dat'), classifier)
+    write_classifierfile(os.path.join(outdir, 'classifier.dat'), data)
