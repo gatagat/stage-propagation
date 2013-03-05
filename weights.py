@@ -51,6 +51,7 @@ if __name__ == '__main__':
         outdir = opts.output
         if not os.path.exists(outdir):
             tsh.makedirs(outdir)
+    inputname = os.path.splitext(os.path.basename(opts.list))[0]
     config = tsh.read_config(opts, __file__)
     meta, data = read_listfile(opts.list)
     args = meta
@@ -60,4 +61,4 @@ if __name__ == '__main__':
         args.update({'distance_factor': opts.factor})
     args, weights = compute_weight_matrix(opts.method, args, data, output_dir=outdir)
     clean_args(args)
-    write_listfile(os.path.join(outdir, 'weights.csv'), weights, **args)
+    write_listfile(os.path.join(outdir, inputname + '-weights.csv'), weights, input_name=inputname, **args)

@@ -8,6 +8,7 @@ import sklearn.grid_search
 import sklearn.svm
 import sys
 import tempfile
+import time
 
 import tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, read_truthfile, read_featurefile, write_classifierfile
@@ -92,6 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--method', dest='method', required=True, action='store', choices=method_table.keys(), default=None, help='Method name.')
     parser.add_argument('-a', '--args', dest='args', required=False, action='store', default=None, help='Method arguments file.')
     parser.add_argument('-t', '--truth', dest='truth', required=True, action='store', default=None, help='Truth file.')
+    parser.add_argument('--random-seed', dest='seed', required=False, action='store', type=int, default=-1, help='Random seed, by default use time.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
     opts = parser.parse_args(sys.argv[1:])
     if opts.output == None:
@@ -107,10 +109,16 @@ if __name__ == '__main__':
     if opts.args != None:
         args.update(read_argsfile(opts.args))
     assert (np.array(feature_ids) == np.array(truth_ids)).all()
-    classifier_meta, classifier = train_classifier(opts.method, args, truth_ids, features, target, output_dir=outdir)
+    if opts.seed == -1:
+        seed = int(time.time()*1024*1024)
+    else:
+        seed = opts.seed
+    np.random.seed(seed)
+    args, classifier = train_classifier(opts.method, args, truth_ids, features, target, output_dir=outdir)
+    args['random_generator_seed'] = seed
     data = {
             'classifier': classifier,
-            'meta': classifier_meta,
+            'meta': args,
             'truth': { 'meta': truth_meta, 'ids': truth_ids, 'target': target },
             'features': { 'meta': feature_meta, 'ids': feature_ids, 'data': features }
             }

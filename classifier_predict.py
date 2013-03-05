@@ -33,17 +33,19 @@ if __name__ == '__main__':
         outdir = opts.output
         if not os.path.exists(outdir):
             tsh.makedirs(outdir)
+    inputname = os.path.splitext(os.path.basename(opts.list))[0]
     config = tsh.read_config(opts, __file__)
     meta, data = read_listfile(opts.list)
     classifier = read_classifierfile(opts.model)
     feature_method = classifier['features']['meta']['feature_method']
     feature_args = meta.copy()
+    del classifier['features']['meta']['input_name'] # training input_name would shadow the current one
     feature_args.update(classifier['features']['meta'])
     args, features = compute_features(feature_method, feature_args, data, output_dir=outdir)
     assert (data['id'] == features['id']).all()
     clean_args(args)
-    write_listfile(os.path.join(outdir, 'feats-test.csv'), features, **args)
+    write_listfile(os.path.join(outdir, inputname + '-feats.csv'), features, input_name=inputname, **args)
     labels_name = classifier['meta']['truth'] + '_labels'
     labels = classifier['meta'][labels_name]
     pred = predict(classifier['classifier'], sorted(labels.keys()), features, output_dir=outdir)
-    write_listfile(os.path.join(outdir, 'predictions.csv'), pred, classifier_name=opts.model, truth=classifier['meta']['truth'], labels_name=labels)
+    write_listfile(os.path.join(outdir, inputname + '-predictions.csv'), pred, classifier_name=opts.model, truth=classifier['meta']['truth'], labels_name=labels, input_name=inputname)

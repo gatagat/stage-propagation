@@ -161,6 +161,14 @@ def write_classifierfile(filename, classifier):
     tsh.serialize(filename, classifier)
 
 
+def read_propagatorfile(filename):
+    return tsh.deserialize(filename)
+
+
+def write_propagatorfile(filename, propagator):
+    tsh.serialize(filename, propagator)
+
+
 def clean_args(args):
     if 'unserialized' not in args:
         return

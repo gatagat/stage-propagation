@@ -44,7 +44,7 @@ def _solve_binary(labels, confidences, weights, unary_weight=1., smoothness_weig
     n = len(weights)
     L = np.diag(weights.sum(axis=1)) - weights.astype(float)
     S = np.diag(confidences).astype(float)
-    M = unary_weight*S + smoothness_weight*L + regularization_weight*np.eye(n, dtype=float)
+    M = unary_weight*S + smoothness_weight*L + smoothness_weight*regularization_weight*np.eye(n, dtype=float)
     c, lower = sp.linalg.cho_factor(M)
     pred = sp.linalg.cho_solve((c, lower), np.dot(S, labels))
     return (pred + 1) / 2
@@ -83,18 +83,23 @@ def propagate_labels(predictions, weights, method_name=None, labels=None, output
     assert labels != None
     assert method_name != None
     assert output_dir != None
+    assert weights.shape[0] == len(predictions)
+    assert weights.shape[1] == len(predictions)
     propagated = np.zeros(len(predictions), dtype=predictions.dtype)
     propagated['id'] = predictions['id']
     for class_num, class_label in labels.items():
+        confidence_name = 'prob%d' % class_num
+        confidences = predictions[confidence_name]
         if method_name == 'general':
             propagate_fn = _solve_binary
             predicted_labels = (predictions['pred'] == class_num).astype(float)*2 - 1
         else:
             propagate_fn =_solve_binary_harmonic_function
             predicted_labels = (predictions['pred'] == class_num).astype(float)
-        confidence_name = 'prob%d' % class_num
-        propagated[confidence_name] = propagate_fn(predicted_labels, predictions[confidence_name], weights, **kwargs)
+            confidences *= kwargs['unary_weight']
+        propagated[confidence_name] = propagate_fn(predicted_labels, confidences, weights, **kwargs)
     confidence_names = [ 'prob%d' % n for n in labels.keys() ]
     pred = propagated[confidence_names].view(float).reshape(len(propagated), -1).argmax(axis=1)
     propagated['pred'] = np.array(labels.keys())[pred]
+    propagated['pred_argmax'] = propagated['pred']
     return propagated

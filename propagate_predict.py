@@ -5,13 +5,9 @@ import os
 import tempfile
 
 import tsh; logger = tsh.create_logger(__name__)
-from utils import read_argsfile, read_listfile, read_weightsfile, write_listfile, clean_args
-from semisupervised import propagate_labels
+from utils import read_listfile, read_weightsfile, read_propagatorfile, write_listfile, clean_args
 
-method_table = {
-        'harmonic': { 'function': lambda p, w, **kw: propagate_labels(p, w, method_name='harmonic', **kw) },
-        'general': { 'function': lambda p, w, **kw: propagate_labels(p, w, method_name='general', **kw) }
-        }
+from propagate_train import method_table
 
 def propagate(method_name, method_args, predictions, weights, output_dir=None):
     args = method_args.copy()
@@ -26,8 +22,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Propagates labels using predictions and weights.')
     parser.add_argument('-c', '--config', dest='config', required=False, action='store', default=None, help='Path to the config file')
-    parser.add_argument('-m', '--method', dest='method', required=True, action='store', choices=method_table.keys(), default=None, help='Method name.')
-    parser.add_argument('-a', '--args', dest='args', required=False, action='store', default=None, help='Method arguments file.')
+    parser.add_argument('-m', '--model', dest='model', required=True, action='store', default=None, help='Model file.')
     parser.add_argument('-w', '--weights', dest='weights', required=True, action='store', default=None, help='Weights file.')
     parser.add_argument('-p', '--predictions', dest='predictions', required=True, action='store', default=None, help='Predictions file.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
@@ -40,13 +35,18 @@ if __name__ == '__main__':
             tsh.makedirs(outdir)
     config = tsh.read_config(opts, __file__)
     args = {}
-    meta, predictions = read_listfile(opts.predictions)
-    args.update(meta)
-    meta, sample_ids, weights = read_weightsfile(opts.weights)
+    predictions_meta, predictions = read_listfile(opts.predictions)
+    args.update(predictions_meta)
+    weights_meta, sample_ids, weights = read_weightsfile(opts.weights)
     assert (predictions['id'] == np.array(sample_ids)).all()
-    args.update(meta)
-    if opts.args != None:
-        args.update(read_argsfile(opts.args))
-    args, prop = propagate(opts.method, args, predictions, weights, output_dir=outdir)
+    assert predictions_meta['input_name'] == weights_meta['input_name'], \
+            'Expecting same input names (%s x %s)' % (predictions_meta['input_name'], weights_meta['input_name'])
+    inputname = predictions_meta['input_name']
+    args.update(weights_meta)
+    model = read_propagatorfile(opts.model)['propagator']
+    method_name = model['method_name']
+    del model['method_name']
+    args.update(model)
+    args, prop = propagate(method_name, args, predictions, weights, output_dir=outdir)
     clean_args(args)
-    write_listfile(os.path.join(outdir, 'propagated.csv'), prop, **args)
+    write_listfile(os.path.join(outdir, inputname + '-propagated.csv'), prop, **args)
