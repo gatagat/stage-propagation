@@ -6,6 +6,7 @@ import os
 import sklearn
 import sklearn.grid_search
 import sklearn.svm
+import sklearn.metrics
 import sys
 import tempfile
 import time
@@ -15,7 +16,7 @@ from utils import read_argsfile, read_truthfile, read_featurefile, write_classif
 
 
 scoring_table = {
-        'accuracy': sklearn.metrics.zero_one_score
+        'accuracy': sklearn.metrics.accuracy_score
         }
 
 
@@ -41,11 +42,13 @@ def train_svm(ids, features, target, labels, balance=None, coarse_C=None, scorin
     logger.info('Coarse grid search')
     grid = sklearn.grid_search.GridSearchCV(
             #sklearn.svm.LinearSVC(class_weight=class_weight),
-            sklearn.svm.SVC(class_weight=class_weight, kernel='linear', probability=False),
+            sklearn.svm.SVC(class_weight=class_weight, kernel='linear', probability=False, verbose=True, max_iter=10000000),
             #n_jobs=4,
             param_grid=dict(C=coarse_C),
             score_func=scoring_table[scoring],
-            cv=sklearn.cross_validation.StratifiedKFold(y=target, k=folds))
+            cv=sklearn.cross_validation.StratifiedKFold(y=target, n_folds=folds),
+            verbose=True)
+            #refit=False)
     grid.fit(features, target)
     cv_score = grid.best_score_
     logger.info('Best C-parameter: %f', grid.best_estimator_.C)

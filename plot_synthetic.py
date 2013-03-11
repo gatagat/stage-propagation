@@ -33,21 +33,26 @@ if __name__ == '__main__':
     config = tsh.read_config(opts, __file__)
     if opts.truth != None:
         meta, data = read_listfile(opts.truth)
-        labels = data['class']
+        target = data['class']
         basename = os.path.splitext(os.path.basename(opts.truth))[0]
     else:
-        feats_meta, feats = read_listfile(opts.list)
+        meta, data = read_listfile(opts.list)
         pred_meta, pred = read_listfile(opts.pred)
         assert pred_meta['input_name'] == os.path.splitext(os.path.basename(opts.list))[0]
-        assert (pred['id'] == feats['id']).all()
-        labels = pred['pred']
-        data = feats
+        assert (pred['id'] == data['id']).all()
+        target = pred['pred']
         basename = os.path.splitext(os.path.basename(opts.pred))[0]
-    classes = np.unique(labels)
+    try:
+        labels = meta[meta['truth'] + '_labels']
+    except:
+        labels = dict((n, 'Class %d' % n) for n in np.unique(target))
+    all_classes = sorted(labels.keys())
+    classes = np.unique(target)
+    colors = np.array(colors)[np.in1d(all_classes, classes)]
     for c, color in zip(classes, colors):
-        mask = labels == c
+        mask = target == c
         plt.scatter(data[mask][opts.x_feature], data[mask][opts.y_feature], c=color, edgecolors='none', alpha=0.4)
-        plt.scatter(None, None, c=color, edgecolors='none', label='Class %d' % c)
+        plt.scatter(None, None, c=color, edgecolors='none', label=labels[c])
         plt.hold(True)
     plt.xlabel(opts.x_feature)
     plt.ylabel(opts.y_feature)
@@ -56,7 +61,7 @@ if __name__ == '__main__':
     plt.close()
 
     for f in [opts.x_feature, opts.y_feature]:
-        plt.hist([data[labels == c][f] for c in classes], histtype='barstacked', color=colors[:len(classes)], label=['Class %d' % c for c in classes])
+        plt.hist([data[target == c][f] for c in classes], histtype='barstacked', color=colors, label=[labels[c] for c in classes])
         plt.xlabel('Count')
         plt.ylabel('Classes')
         plt.legend()

@@ -69,7 +69,9 @@ if __name__ == '__main__':
     sorted_class_nums = sorted(labels.keys())
     sorted_class_labels = tsh.dict_values(labels, sorted_class_nums)
     cm = sklearn.metrics.confusion_matrix(truth, pred['pred'], labels=sorted_class_nums)
-    print 'Accuracy: %.2f' % (np.diag(cm).sum() / float(np.sum(cm)))
+    acc = (np.diag(cm).sum() / float(np.sum(cm)))
     tsh.plot_confusion_matrix(cm, labels=sorted_class_labels)
+    print 'Accuracy: %.2f' % acc
+    plt.title('Accuracy: %.2f' % acc)
     plt.savefig(os.path.join(outdir, predname + '-cm.svg'))
     plt.close()

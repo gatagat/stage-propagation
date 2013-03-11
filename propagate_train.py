@@ -21,7 +21,7 @@ import sklearn.grid_search
 from joblib import Parallel, delayed
 
 scoring_table = {
-        'accuracy': sklearn.metrics.zero_one_score
+        'accuracy': sklearn.metrics.accuracy_score
         }
 
 def train(method_name, method_args, ids, predictions, weights, target, output_dir=None):
@@ -29,9 +29,9 @@ def train(method_name, method_args, ids, predictions, weights, target, output_di
     label_name = args['truth'] + '_labels'
     labels = args[label_name]
     propagate_fn = method_table[method_name]['function']
-    cv = sklearn.cross_validation.StratifiedKFold(y=target, k=args['folds'])
+    cv = sklearn.cross_validation.StratifiedKFold(y=target, n_folds=args['folds'])
     hyper_params = args['hyper_params']
-    grid = sklearn.grid_search.IterGrid(dict(zip(hyper_params, [ args[p] for p in hyper_params ])))
+    grid = sklearn.grid_search.ParameterGrid(dict(zip(hyper_params, [ args[p] for p in hyper_params ])))
     verbose = True
     scoring = args['scoring']
 
