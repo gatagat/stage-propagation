@@ -24,21 +24,19 @@ scoring_table = {
         'accuracy': sklearn.metrics.accuracy_score
         }
 
-def train(method_name, method_args, ids, predictions, weights, target, output_dir=None):
+def train(method_name, method_args, ids, predictions, dissim, target, output_dir=None):
     args = method_args.copy()
     label_name = args['truth'] + '_labels'
     labels = args[label_name]
-    propagate_fn = method_table[method_name]['function']
     cv = sklearn.cross_validation.StratifiedKFold(y=target, n_folds=args['folds'])
     hyper_params = args['hyper_params']
     grid = sklearn.grid_search.ParameterGrid(dict(zip(hyper_params, [ args[p] for p in hyper_params ])))
     verbose = True
-    scoring = args['scoring']
 
     cv_results = Parallel(n_jobs=1, verbose=verbose,
         pre_dispatch='2*n_jobs')(
         delayed(fit_and_score)(
-        predictions, weights, target, labels, propagate_fn, propagate_params, train, scoring_table[scoring], verbose, output_dir, **args)
+        predictions, dissim, target, labels, method_name, propagate_params, train, verbose, output_dir, **args)
         for propagate_params in grid for train, _ in cv)
 
     n_grid_points = len(list(grid))
@@ -64,10 +62,17 @@ def train(method_name, method_args, ids, predictions, weights, target, output_di
     model.update(params[best_n])
     return args, model
 
-def fit_and_score(predictions, weights, target, labels, propagate_fn, propagate_params, indices, scoring_fn, verbose, output_dir, **kwargs):
+def get_weights(dissim, distance_factor):
+    weights = np.exp(-dissim * distance_factor)
+    weights[np.diag_indices_from(weights)] = 0.
+    return weights
+
+def fit_and_score(predictions, dissim, target, labels, method_name, propagate_params, indices, verbose, output_dir, **kwargs):
     kwargs.update(propagate_params)
-    propagated = propagate_fn(predictions[indices], weights[np.ix_(indices, indices)], labels=labels, output_dir=output_dir, **kwargs)
-    score = scoring_fn(propagated['pred'], target[indices])
+    weights = get_weights(dissim[np.ix_(indices, indices)], propagate_params['bandwidth'])
+    propagate_fn = method_table[method_name]['function']
+    propagated = propagate_fn(predictions[indices], weights, labels=labels, output_dir=output_dir, **kwargs)
+    score = scoring_table[kwargs['scoring']](propagated['pred'], target[indices])
     return score, propagate_params
 
 
@@ -77,7 +82,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config', dest='config', required=False, action='store', default=None, help='Path to the config file')
     parser.add_argument('-m', '--method', dest='method', required=True, action='store', choices=method_table.keys(), default=None, help='Method name.')
     parser.add_argument('-a', '--args', dest='args', required=False, action='store', default=None, help='Method arguments file.')
-    parser.add_argument('-w', '--weights', dest='weights', required=True, action='store', default=None, help='Weights file.')
+    parser.add_argument('-d', '--dissimilarities', dest='dissim', required=True, action='store', default=None, help='Dissimilarities file.')
     parser.add_argument('-p', '--predictions', dest='predictions', required=True, action='store', default=None, help='Predictions file.')
     parser.add_argument('-t', '--truth', dest='truth', required=True, action='store', default=None, help='Truth file.')
     parser.add_argument('--random-seed', dest='seed', required=False, action='store', type=int, default=-1, help='Random seed, by default use time.')
@@ -95,9 +100,9 @@ if __name__ == '__main__':
     args.update(predictions_meta)
     truth_meta, truth_ids, target = read_truthfile(opts.truth)
     assert (predictions['id'] == np.array(truth_ids)).all()
-    weights_meta, weights_ids, weights = read_weightsfile(opts.weights)
-    assert (predictions['id'] == np.array(weights_ids)).all()
-    args.update(weights_meta)
+    dissim_meta, dissim_ids, dissim = read_weightsfile(opts.dissim)
+    assert (predictions['id'] == np.array(dissim_ids)).all()
+    args.update(dissim_meta)
     if opts.args != None:
         args.update(read_argsfile(opts.args))
     if opts.seed == -1:
@@ -105,7 +110,7 @@ if __name__ == '__main__':
     else:
         seed = opts.seed
     np.random.seed(seed)
-    args, model = train(opts.method, args, truth_ids, predictions, weights, target, output_dir=outdir)
+    args, model = train(opts.method, args, truth_ids, predictions, dissim, target, output_dir=outdir)
     args['random_generator_seed'] = seed
     clean_args(args)
     data = {
@@ -113,6 +118,6 @@ if __name__ == '__main__':
             'meta': args,
             'truth': { 'meta': truth_meta, 'ids': truth_ids, 'target': target },
             'pred': { 'meta': predictions_meta, 'pred': predictions },
-            'weights': { 'meta': weights_meta, 'ids': weights_ids, 'weights': weights }
+            'dissim': { 'meta': dissim_meta, 'ids': dissim_ids, 'dissim': dissim }
             }
     write_propagatorfile(os.path.join(outdir, 'propagator.dat'), data)

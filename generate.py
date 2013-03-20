@@ -5,11 +5,13 @@ import numpy as np
 import tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, write_listfile, clean_args
 
-def generate(N=None, priors=None, means=None, sigmas=None, feature_dims=None, weight_dims=None, **kwargs):
+def generate(N=None, priors=None, means=None, sigmas=None, feature_dims=None, weight_dims=None, noise_dims=None, **kwargs):
     args = kwargs.copy()
     n_feats = len(means)
     assert n_feats == len(sigmas)
-    assert n_feats == feature_dims + weight_dims
+    if noise_dims == None:
+        noise_dims = 0
+    assert n_feats == feature_dims + weight_dims + noise_dims
     feature_names = ['f%02d' % d for d in range(n_feats)]
     data = np.zeros(N, dtype=[('id', int), ('class', int)] + zip(feature_names, [np.float64]*n_feats))
     data['id'] = range(N)
@@ -32,8 +34,8 @@ def generate(N=None, priors=None, means=None, sigmas=None, feature_dims=None, we
     args['means'] = means
     args['sigmas'] = sigmas
     args['class_labels'] = dict(zip(range(1, n_classes+1), [ 'C%02d' % i for i in range(1, n_classes+1) ]))
-    args['feature_names'] = feature_names[:feature_dims]
-    args['weight_names'] = feature_names[weight_dims:]
+    args['feature_names'] = feature_names[:feature_dims] + feature_names[feature_dims+weight_dims:]
+    args['weight_names'] = feature_names[feature_dims:feature_dims+weight_dims] + feature_names[feature_dims+weight_dims:]
     args['truth'] = 'class'
     return args, data
 

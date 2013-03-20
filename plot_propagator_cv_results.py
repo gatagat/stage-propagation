@@ -42,3 +42,33 @@ if __name__ == '__main__':
     plt.subplots_adjust(0.10, 0.30, 0.94, 0.92)
     plt.savefig(os.path.join(outdir, basename + '-cv.svg'))
     plt.close()
+
+    param_names = cv_results[0][1].keys()
+    assert len(param_names) == 2
+    param_values = []
+    for name in param_names:
+        param_values += [ np.unique([ params[name] for _, params in cv_results ]) ]
+    param_index = []
+    for values in param_values:
+        param_index += [ dict(zip(values, range(len(values)))) ]
+    data = np.zeros((len(param_names[0]), len(param_names[1])))
+    for score, params in cv_results:
+        data[param_index[0][params[param_names[0]]], param_index[1][params[param_names[1]]]] = score
+    fig = plt.figure()
+    plt.clf()
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+    res = ax.imshow(data, cmap=plt.cm.jet, origin='lower', interpolation='nearest')
+    for y in xrange(len(param_values[0])):
+        for x in xrange(len(param_values[1])):
+            ax.annotate('%.2f' % data[y][x], xy=(x, y),
+                        horizontalalignment='center',
+                        verticalalignment='center', size='small')
+    plt.ylabel(param_names[0])
+    plt.xlabel(param_names[1])
+    plt.yticks(range(len(param_values[0])), param_values[0])
+    plt.xticks(range(len(param_values[1])), param_values[1])
+    plt.ylim(-.5, len(param_values[0])-.5)
+    plt.xlim(-.5, len(param_values[1])-.5)
+    plt.savefig(os.path.join(outdir, basename + '-cv2.svg'))
+    plt.close()

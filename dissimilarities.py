@@ -12,7 +12,7 @@ from dissimilarities_expression import get_dissimilarities as get_dissimilaritie
 def get_pregenerated_feature_distances(data, weight_names=None, **kwargs):
     assert weight_names is not None
     kwargs['weight_names'] = weight_names
-    return kwargs, tsh.pdist2(data[weight_names], distance=lambda a, b: (a.view(float) - b.view(float)) ** 2)
+    return kwargs, tsh.pdist2(data[weight_names], distance=lambda a, b: ((np.array(list(a)) - np.array(list(b))) ** 2).sum())
 
 
 method_table = {

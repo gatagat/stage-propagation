@@ -69,9 +69,12 @@ A pickled (serialized) bzip2-compressed Python dictionary with the following ent
 A prediction file is a truth file with additional columns: `pred` with the predicted class and `probN` with probability of the class `N`.
 
 
-### Evaluation file
+### Propagator file
 
-Just a text file.
+A pickled (serialized) bzip2-compressed Python dictionary with the following entries:
+
+    propagator = { propagator_params… }
+    meta = …
 
 ## Classification
 

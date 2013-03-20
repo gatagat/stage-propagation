@@ -58,7 +58,7 @@ def extract_expression(image_file, mask_file, inside_file, expression_file, data
     return expression
 
 
-def get_distances(data, output_dir=None, image_prefix=None, mask_prefix=None, **kwargs):
+def get_dissimilarities(data, output_dir=None, image_prefix=None, mask_prefix=None, **kwargs):
     assert image_prefix != None
     assert mask_prefix != None
     assert output_dir != None

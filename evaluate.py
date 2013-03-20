@@ -42,6 +42,9 @@ if __name__ == '__main__':
         roc_auc = sklearn.metrics.auc(fpr, tpr)
         precision, recall, _ = sklearn.metrics.precision_recall_curve(true, prob)
         prc_auc = sklearn.metrics.auc(recall, precision)
+        # XXX: get rid of the precision = 1 for recall = 0
+        precision = precision[:-1]
+        recall = recall[:-1]
 
         plt.clf()
         plt.plot(fpr, tpr, label='AUC = %0.2f' % roc_auc)

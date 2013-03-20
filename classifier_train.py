@@ -15,11 +15,6 @@ import tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, read_truthfile, read_featurefile, write_classifierfile
 
 
-scoring_table = {
-        'accuracy': sklearn.metrics.accuracy_score
-        }
-
-
 def train_svm(ids, features, target, labels, balance=None, coarse_C=None, scoring=None, folds=None, output_dir=None, **kwargs):
     assert coarse_C != None
     assert balance != None
@@ -42,10 +37,10 @@ def train_svm(ids, features, target, labels, balance=None, coarse_C=None, scorin
     logger.info('Coarse grid search')
     grid = sklearn.grid_search.GridSearchCV(
             #sklearn.svm.LinearSVC(class_weight=class_weight),
-            sklearn.svm.SVC(class_weight=class_weight, kernel='linear', probability=False, verbose=True, max_iter=10000000),
-            #n_jobs=4,
+            sklearn.svm.SVC(class_weight=class_weight, kernel='linear', probability=False, verbose=False, max_iter=10000000),
+            n_jobs=4,
             param_grid=dict(C=coarse_C),
-            score_func=scoring_table[scoring],
+            scoring=scoring,
             cv=sklearn.cross_validation.StratifiedKFold(y=target, n_folds=folds),
             verbose=True)
             #refit=False)
