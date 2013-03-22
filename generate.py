@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+import time
 
 import tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, write_listfile, clean_args
@@ -44,9 +45,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate synthetic data.')
     parser.add_argument('-c', '--config', dest='config', required=False, action='store', default=None, help='Path to the config file')
     parser.add_argument('-a', '--args', dest='args', required=True, action='store', default=None, help='Method arguments file.')
+    parser.add_argument('--random-seed', dest='seed', required=False, action='store', type=int, default=-1, help='Random seed, by default use time.')
     parser.add_argument('output', action='store', default=None, help='Output file.')
     opts = parser.parse_args()
     config = tsh.read_config(opts, __file__)
+    if opts.seed == -1:
+        seed = int(time.time()*1024*1024)
+    else:
+        seed = opts.seed
+    np.random.seed(seed)
     args = read_argsfile(opts.args)
     args, data = generate(**args)
     clean_args(args)

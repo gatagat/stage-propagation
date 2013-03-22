@@ -8,7 +8,7 @@ import sklearn.metrics
 import tempfile
 
 import tsh; logger = tsh.create_logger(__name__)
-from utils import read_listfile, read_truthfile
+from utils import read_listfile, read_truthfile, select
 
 if __name__ == '__main__':
     import argparse
@@ -29,7 +29,9 @@ if __name__ == '__main__':
     config = tsh.read_config(opts, __file__)
     truth_meta, truth_ids, truth = read_truthfile(opts.truth)
     pred_meta, pred = read_listfile(opts.predictions)
-    assert (pred['id'] == np.array(truth_ids)).all()
+    pred = select(pred, 'id', truth_ids)
+    logger.info('Using %d predicted samples with ground truth to evaluate', len(pred))
+    assert (np.array(truth_ids) == pred['id']).all()
 
     truth_name = truth_meta['truth']
     labels = truth_meta[truth_name + '_labels']
@@ -43,8 +45,8 @@ if __name__ == '__main__':
         precision, recall, _ = sklearn.metrics.precision_recall_curve(true, prob)
         prc_auc = sklearn.metrics.auc(recall, precision)
         # XXX: get rid of the precision = 1 for recall = 0
-        precision = precision[:-1]
-        recall = recall[:-1]
+        if len(precision) > 1:
+            precision[-1] = precision[-2]
 
         plt.clf()
         plt.plot(fpr, tpr, label='AUC = %0.2f' % roc_auc)

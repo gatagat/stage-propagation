@@ -176,3 +176,29 @@ def clean_args(args):
         if name in args:
             del args[name]
 
+def select(data, field, values):
+    """
+    Selects rows of data where column field has one of values.
+    Each value has to be present at most once in data[field].
+
+    Parameters:
+    -----------
+    data: recarray
+        Data to be selected from, containing column field.
+    field: string
+        Column name.
+    values: iterable
+        Values of data[field] that mark the rows to select.
+
+    Returns:
+    --------
+    The data is returned in the order given by values.
+    """
+    indices = []
+    for v in values:
+        j = np.nonzero(data[field] == v)[0]
+        if len(j) == 0:
+            continue
+        assert len(j) == 1
+        indices += [j[0]]
+    return data[np.array(indices)]
