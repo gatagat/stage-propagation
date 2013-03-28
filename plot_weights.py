@@ -40,10 +40,14 @@ if __name__ == '__main__':
         ax_target_y = divider.append_axes("right", size=1.0, pad=-0.3, sharey=ax)
     ax.imshow(lweights[np.ix_(order, order)])
     if opts.truth != None:
-        meta, ids, target = read_truthfile(opts.truth)
+        meta, truth_ids, target = read_truthfile(opts.truth)
         target -= 1
-        target2 = np.zeros((30, len(target)), dtype=target.dtype)
-        target2[:] = target[np.ix_(order)]
+        target[target < 0] = 255
+        target_full = np.array([255] * len(order), dtype=target.dtype)
+        for i, t in zip(truth_ids, target):
+            target_full[ids == i] = t
+        target2 = np.zeros((30, len(target_full)), dtype=target_full.dtype)
+        target2[:] = target_full[np.ix_(order)]
         target2 = target2.T
         ax_target_y.imshow(target2, cmap='classes')
         ax_target_y.set_axis_off()
