@@ -1,2 +1,2 @@
 distance_factor: 200
-unserialized: [output_dir]
+unserialized: [input_name, output_dir]

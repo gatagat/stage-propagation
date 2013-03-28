@@ -2,6 +2,8 @@
 
 .SECONDARY: 
 
+include Makefile.local
+
 BASE=~/projs/VT/experiments/e130117_iccv
 PLOT_SYNTHETIC=$(BASE)/plot_synthetic.py 
 FEATURES=$(BASE)/features.py
@@ -46,10 +48,10 @@ clean:
 	rm -f *-predictions.csv *-propagated.csv *-feats.csv *-truth.csv *-data.csv *-dissim.csv *-distances.dat 2>/dev/null
 
 %-truth.csv: truth/%.csv
-	$(CONVERT_TRUTH) -p /Users/kazmar/tmp/Segmentation/Fine/MetaSys/ -o . $<
+	$(CONVERT_TRUTH) -p $(IMAGE_PREFIX) -o . $<
 
 %-data.csv: all/%.csv
-	$(CONVERT) -p /Users/kazmar/tmp/Segmentation/Fine/MetaSys/ -o . $<
+	$(CONVERT) -p $(IMAGE_PREFIX) -o . $<
 
 %-feats.csv: %.csv chaincode.args
 	$(FEATURES) -m chaincode -a chaincode.args -l $< -o .

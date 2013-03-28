@@ -87,7 +87,7 @@ train-propagator/propagator-cv.svg: propagator.dat
 test-propagated.csv: test-dissim.csv test-predictions.csv propagator.dat
 	$(PR_PREDICT) -m propagator.dat -d test-dissim.csv -p test-predictions.csv -o .
 
-test/test-predictions-cm.svg: test-predictions.csv test.csv
+test/test-predictions-cm.svg: test-predictions.csv test.csv test-part.csv
 	$(PLOT_SYNTHETIC) -x f00 -y f01 -l test.csv -p test-predictions.csv -o test
 	$(EVALUATE) -p test-predictions.csv -t test.csv -o test
 	$(EVALUATE) -p test-predictions.csv -t test-part.csv -o test-part

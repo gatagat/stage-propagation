@@ -51,9 +51,10 @@ if __name__ == '__main__':
     colors = np.array(colors)[np.in1d(all_classes, classes)]
     for c, color in zip(classes, colors):
         mask = target == c
-        plt.scatter(data[mask][opts.x_feature], data[mask][opts.y_feature], c=color, edgecolors='none', alpha=0.4)
-        plt.scatter(None, None, c=color, edgecolors='none', label=labels[c])
-        plt.hold(True)
+        if mask.any():
+            plt.scatter(data[mask][opts.x_feature], data[mask][opts.y_feature], c=color, edgecolors='none', alpha=0.4)
+            plt.scatter(None, None, c=color, edgecolors='none', label=labels[c])
+            plt.hold(True)
     plt.xlabel(opts.x_feature)
     plt.ylabel(opts.y_feature)
     plt.legend()
