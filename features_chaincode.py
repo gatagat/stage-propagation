@@ -221,7 +221,7 @@ def prepare_chaincode_features(data, dictionary_name=None, bow_options_name=None
         return ret
 
     # Compute dictionary - for this we need the chaincodes
-    chaincode_dtype = [ ('id', int) ] + zip(
+    chaincode_dtype = [ ('id', data.dtype['id']) ] + zip(
                 [ 'cc%02d' % scale for scale in bow_options['scales'] ],
                 ['O'] * len(bow_options['scales']))
     chaincodes = np.zeros(len(data), dtype=chaincode_dtype)

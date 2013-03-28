@@ -85,8 +85,8 @@ def propagate_labels(predictions, weights, method_name=None, labels=None, output
     assert output_dir != None
     assert weights.shape[0] == len(predictions)
     assert weights.shape[1] == len(predictions)
-    propagated = np.zeros(len(predictions), dtype=predictions.dtype)
-    propagated['id'] = predictions['id']
+    i = 0
+    prop = np.zeros((len(predictions), len(labels)), dtype=float)
     for class_num, class_label in labels.items():
         confidence_name = 'prob%d' % class_num
         confidences = predictions[confidence_name]
@@ -97,9 +97,16 @@ def propagate_labels(predictions, weights, method_name=None, labels=None, output
             propagate_fn =_solve_binary_harmonic_function
             predicted_labels = (predictions['pred'] == class_num).astype(float)
             confidences *= kwargs['unary_weight']
-        propagated[confidence_name] = propagate_fn(predicted_labels, confidences, weights, **kwargs)
-    confidence_names = [ 'prob%d' % n for n in labels.keys() ]
-    pred = propagated[confidence_names].view(float).reshape(len(propagated), -1).argmax(axis=1)
+        prop[:, i] = propagate_fn(predicted_labels, confidences, weights, **kwargs)
+        i += 1
+    pred = prop.argmax(axis=1)
+    propagated = np.zeros(len(predictions), dtype=predictions.dtype)
+    propagated['id'] = predictions['id']
     propagated['pred'] = np.array(labels.keys())[pred]
     propagated['pred_argmax'] = propagated['pred']
+    i = 0
+    for class_num in labels.keys():
+        confidence_name = 'prob%d' % class_num
+        propagated[confidence_name] = prop[:, i]
+        i += 1
     return propagated

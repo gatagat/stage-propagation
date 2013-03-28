@@ -58,10 +58,11 @@ def extract_expression(image_file, mask_file, inside_file, expression_file, data
     return expression
 
 
-def get_dissimilarities(data, output_dir=None, image_prefix=None, mask_prefix=None, **kwargs):
+def get_dissimilarities(data, output_dir=None, input_name=None, image_prefix=None, mask_prefix=None, **kwargs):
     assert image_prefix != None
     assert mask_prefix != None
     assert output_dir != None
+    assert input_name != None
     measure = kwargs['measure']
     distance_name = kwargs['distance_name']
     rotation_invariance = kwargs['rotation_invariance']
@@ -70,7 +71,7 @@ def get_dissimilarities(data, output_dir=None, image_prefix=None, mask_prefix=No
 
     image_prefix = os.path.expanduser(image_prefix)
     mask_prefix = os.path.expanduser(image_prefix)
-    distance_name = distance_name.format(OUT=output_dir)
+    distance_name = distance_name.format(OUT=output_dir, INPUTNAME=input_name)
     kwargs['distance_name'] = distance_name
     tsh.makedirs(os.path.join(output_dir, 'expr'))
     if os.path.exists(distance_name):

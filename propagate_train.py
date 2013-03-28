@@ -51,6 +51,8 @@ def train(method_name, method_args, data, output_dir=None):
     best_n = np.argmax(scores_mean) 
     # XXX: take model with smallest variance amongst the best
 
+    args['truth'] = data[0]['meta']['truth']
+    args[args['truth'] + '_labels'] = data[0]['meta'][args['truth'] + '_labels']
     args['cv_results'] = cv_results
     args['mean_score'] = scores_mean[best_n]
     args['std_score'] = scores_std[best_n]
@@ -110,9 +112,10 @@ if __name__ == '__main__':
     data = []
     for prediction_name, dissim_name, truth_name in zip(opts.predictions, opts.dissim, opts.truth):
         meta = {}
+        truth_meta, truth_ids, target = read_truthfile(truth_name)
+        meta.update(truth_meta)
         m, predictions = read_listfile(prediction_name)
         meta.update(m)
-        truth_meta, truth_ids, target = read_truthfile(truth_name)
         assert np.in1d(predictions['id'], np.array(truth_ids)).sum() > 0
         m, dissim_ids, dissim = read_weightsfile(dissim_name)
         assert (predictions['id'] == np.array(dissim_ids)).all()

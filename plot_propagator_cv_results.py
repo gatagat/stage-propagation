@@ -51,7 +51,7 @@ if __name__ == '__main__':
     param_index = []
     for values in param_values:
         param_index += [ dict(zip(values, range(len(values)))) ]
-    data = np.zeros((len(param_names[0]), len(param_names[1])))
+    data = np.zeros((len(param_index[0]), len(param_index[1])))
     for score, params in cv_results:
         data[param_index[0][params[param_names[0]]], param_index[1][params[param_names[1]]]] = score
     fig = plt.figure()

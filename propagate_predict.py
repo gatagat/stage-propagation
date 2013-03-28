@@ -45,10 +45,11 @@ if __name__ == '__main__':
             'Expecting same input names (%s x %s)' % (predictions_meta['input_name'], dissim_meta['input_name'])
     inputname = predictions_meta['input_name']
     args.update(dissim_meta)
-    model = read_propagatorfile(opts.model)['propagator']
-    method_name = model['method_name']
-    del model['method_name']
-    args.update(model)
+    model = read_propagatorfile(opts.model)
+    args.update(model['meta'])
+    method_name = model['propagator']['method_name']
+    del model['propagator']['method_name']
+    args.update(model['propagator'])
     args, prop = propagate(method_name, args, predictions, dissim, output_dir=outdir)
     clean_args(args)
     write_listfile(os.path.join(outdir, inputname + '-propagated.csv'), prop, **args)

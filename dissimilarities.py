@@ -21,10 +21,11 @@ method_table = {
         }
 
 
-def compute_dissimilarity(method_name, method_args, data, output_dir=None):
+def compute_dissimilarity(method_name, method_args, data, input_name=None, output_dir=None):
     assert output_dir != None
+    assert input_name != None
     args = method_args.copy()
-    args, D = method_table[method_name]['function'](data, output_dir=output_dir, **args)
+    args, D = method_table[method_name]['function'](data, output_dir=output_dir, input_name=input_name, **args)
     cols = [str(i) for i in data['id']]
     dissim = np.core.records.fromarrays(
             [data['id']] + [D[:, i] for i in range(D.shape[1])],
@@ -53,6 +54,6 @@ if __name__ == '__main__':
     args = meta
     if opts.args != None:
         args.update(read_argsfile(opts.args))
-    args, dissim = compute_dissimilarity(opts.method, args, data, output_dir=outdir)
+    args, dissim = compute_dissimilarity(opts.method, args, data, output_dir=outdir, input_name=inputname)
     clean_args(args)
     write_listfile(os.path.join(outdir, inputname + '-dissim.csv'), dissim, input_name=inputname, **args)

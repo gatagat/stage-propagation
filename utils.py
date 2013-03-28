@@ -149,8 +149,11 @@ def read_weightsfile(filename):
     meta, weights = read_listfile(filename)
     sample_ids = weights['id']
     cols = [str(i) for i in sample_ids]
-    weights = weights[cols].view(np.float64).reshape(len(weights), -1)
-    return meta, sample_ids.tolist(), weights
+    w = np.zeros((len(cols), len(cols)), dtype=np.float64)
+    for i in range(len(cols)):
+        w[i, :] = weights[cols[i]]
+    #w = weights[cols].view(np.float64).reshape(len(weights), -1)
+    return meta, sample_ids.tolist(), w
 
 
 def read_classifierfile(filename):
