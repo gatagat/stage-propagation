@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--prefix', dest='image_prefix', required=False, action='store', default=None, help='Path prefix of all image files.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
     parser.add_argument('-t', '--truth', dest='truth', required=False, action='store', default=None, choices=['stage'], help='Truth column.')
-    parser.add_argument('--no-timestamp', dest='no_timestamp', required=False, action='store_true', default=True, help='Do not suffix timestamp to the output filename.')
+    parser.add_argument('--no-timestamp', dest='no_timestamp', required=False, action='store_true', default=False, help='Do not suffix timestamp to the output filename.')
     parser.add_argument('csv_pattern', action='store', help='Wildcard matching input CSV files.')
     opts = parser.parse_args()
     if opts.output == None:
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     converterd = {'dirname': lambda x: x}
     image_prefix = opts.image_prefix if opts.image_prefix != None else ''
     csv_pattern = opts.csv_pattern
-    dtype = [('id', object), ('mask', 'S50'), ('image', 'S50')]
+    dtype = [('id', object), ('mask', object), ('image', object)]
     if opts.truth == 'stage':
         converterd[opts.truth] = lambda x: x
         truth_map = {
@@ -84,7 +84,7 @@ if __name__ == '__main__':
                 'obj%04d-bri.png' % sample['metasys_id']]
             if opts.truth != None:
                 sample_truth = truth_map[sample[opts.truth]]
-                if sample_truth == None:
+                if sample_truth not in truth_labels.keys():
                     continue
                 dst_sample += [sample_truth]
             dst = np.r_[dst, np.array([tuple(dst_sample)], dtype=dtype)]
@@ -94,15 +94,15 @@ if __name__ == '__main__':
             dst[i]['image'] = os.path.join(dirnames[i], dst[i]['image'])
         out_name = ''
     else:
-        out_name = dirnames[0].replace('/', '_')
+        out_name = dirnames[0].replace('/', '_') + '-'
         image_prefix += dirnames[0]
     dst = np.sort(dst, order='id')
     if not opts.no_timestamp:
-        out_name += '-%s' % time.strftime('%y%m%d%H%M%S', time.localtime(t))
+        out_name += '%s-' % time.strftime('%y%m%d%H%M%S', time.localtime(t))
     if opts.truth == None:
-        out_name += '-data.csv'
+        out_name += 'data.csv'
     else:
-        out_name += '-truth.csv'
+        out_name += 'truth.csv'
     meta = {
         'mask_prefix': image_prefix,
         'image_prefix': image_prefix }
