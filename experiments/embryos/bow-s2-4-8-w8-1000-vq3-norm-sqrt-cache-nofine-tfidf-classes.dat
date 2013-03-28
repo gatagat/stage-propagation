@@ -1,0 +1,10 @@
+dictionary_method: vq
+fine_grid_search: false
+normalize_chaincode: true
+project_do_cache: true
+scales: [2, 4, 8]
+sqrt_histograms: true
+substring_count: 1000
+substring_length: 8
+substring_selection: tfidf-classes
+vq_distance_threshold: 3.0
