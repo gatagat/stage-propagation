@@ -128,8 +128,11 @@ def read_featurefile(filename):
     sample_ids = features['id']
     cols = [n for n in features.dtype.names if n != 'id']
     meta['feature_names'] = cols
-    features = features[cols].view(np.float64).reshape(len(features), -1)
-    return meta, sample_ids.tolist(), features
+    f = np.zeros((len(features), len(cols)), dtype=np.float64)
+    for i in range(len(cols)):
+        f[:, i] = features[cols[i]]
+    #features = features[cols].view(np.float64).reshape(len(features), -1)
+    return meta, sample_ids.tolist(), f
 
 
 def read_weightsfile(filename):
@@ -151,7 +154,7 @@ def read_weightsfile(filename):
     cols = [str(i) for i in sample_ids]
     w = np.zeros((len(cols), len(cols)), dtype=np.float64)
     for i in range(len(cols)):
-        w[i, :] = weights[cols[i]]
+        w[:, i] = weights[cols[i]]
     #w = weights[cols].view(np.float64).reshape(len(weights), -1)
     return meta, sample_ids.tolist(), w
 
@@ -179,7 +182,7 @@ def clean_args(args):
         if name in args:
             del args[name]
 
-def select(data, field, values):
+def select(data, field, values, return_indices=False):
     """
     Selects rows of data where column field has one of values.
     Each value has to be present at most once in data[field].
@@ -204,4 +207,7 @@ def select(data, field, values):
             continue
         assert len(j) == 1
         indices += [j[0]]
-    return data[np.array(indices)]
+    if return_indices == True:
+        return np.array(indices)
+    else:
+        return data[np.array(indices)]

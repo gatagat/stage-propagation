@@ -1,0 +1,20 @@
+.hidden {
+  display:none;
+}
+.shown {
+  display:block;
+}
+.trigger {
+  background:#bdbdbd;
+}
+.open {
+  background:none;
+}
+.hover {
+  background:#dddddd;
+}
+.error {
+  font-weight:bold;
+  color:#B80B14;
+  background:#EDCACC;
+}

@@ -1,0 +1,30 @@
+<html>
+<head>
+ <link rel="stylesheet" type="text/css" href="static/style.css"/>
+ <script type="text/javascript" src="static/sorttable.js"></script>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <div>
+	<table class='sortable'>
+        <tr><th>ID</th><th>Image</th><th>Mask</th><th>Truth</th><th>Predicted</th><th>Propagated</th>
+            {% for i in range(1, k+1) %}
+            <th>{{ i }}.NN</th>
+            {% endfor %}
+        </tr>
+        {% for s in samples %}
+        <tr>
+            <td>{{ s.id }}</td>
+            <td><img src="{{ s.image }}" width="160px"></td>
+            <td><img src="{{ s.mask }}" width="160px"></td>
+            <td>{{ s.truth }}</td>
+            <td{% if s.truth != 'N/A' and s.prediction != s.truth %} class="error"{% endif %}>{{ s.prediction }}</td>
+            <td{% if s.truth != 'N/A' and s.propagated != s.truth %} class="error"{% endif %}>{{ s.propagated }}</td>
+            {% for n in s.neighbors %}
+            <td><img src="{{ n.expr }}" width="160px"><div>{{ n.id }} - {{ n.truth }}/{{ n.prediction }}/{{ n.propagated }} : {{ '%.2f' % n.dissim }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </div>
+</body>
+</html>

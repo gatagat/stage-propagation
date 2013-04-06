@@ -9,7 +9,11 @@ from utils import read_listfile, read_classifierfile, write_listfile, clean_args
 from features import compute_features
 
 def predict(model, classes, features, output_dir=None):
-    _f = features[[n for n in features.dtype.names if n != 'id']].view(np.float64).reshape(len(features), -1)
+    cols = [n for n in features.dtype.names if n != 'id']
+    _f = np.zeros((len(features), len(cols)), dtype=np.float64)
+    for i in range(len(cols)):
+        _f[:, i] = features[cols[i]]
+    #_f = features[].view(np.float64).reshape(len(features), -1)
     pred = model.predict(_f).astype(int)
     proba = model.predict_proba(_f)
     pred_argmax = np.array(classes)[proba.argmax(axis=1)]
@@ -41,7 +45,7 @@ if __name__ == '__main__':
     feature_args = meta.copy()
     del classifier['features']['meta']['input_name'] # training input_name would shadow the current one
     feature_args.update(classifier['features']['meta'])
-    args, features = compute_features(feature_method, feature_args, data, output_dir=outdir)
+    args, features = compute_features(feature_method, feature_args, data, input_name=inputname, output_dir=outdir)
     assert (data['id'] == features['id']).all()
     clean_args(args)
     write_listfile(os.path.join(outdir, inputname + '-feats.csv'), features, input_name=inputname, **args)

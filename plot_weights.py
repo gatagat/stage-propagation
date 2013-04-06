@@ -30,31 +30,47 @@ if __name__ == '__main__':
     config = tsh.read_config(opts, __file__)
     meta, ids, weights = read_weightsfile(opts.weights)
 
-    lweights = weights #-np.log(weights)
-    #lweights[np.isinf(lweights)] = lweights[~np.isinf(lweights)].min()
-    clustering = hier.linkage(lweights, method='average')
-    order = hier.leaves_list(clustering)
-    ax = plt.gca()
+    lweights = weights
+    lweights[np.isinf(lweights)] = 2*lweights[~np.isinf(lweights)].max()
     if opts.truth != None:
-        divider = make_axes_locatable(ax)
-        ax_target_y = divider.append_axes("right", size=1.0, pad=-0.3, sharey=ax)
-    ax.imshow(lweights[np.ix_(order, order)])
-    if opts.truth != None:
-        meta, truth_ids, target = read_truthfile(opts.truth)
-        target -= 1
-        target[target < 0] = 255
-        target_full = np.array([255] * len(order), dtype=target.dtype)
-        for i, t in zip(truth_ids, target):
-            target_full[ids == i] = t
-        target2 = np.zeros((30, len(target_full)), dtype=target_full.dtype)
-        target2[:] = target_full[np.ix_(order)]
-        target2 = target2.T
-        ax_target_y.imshow(target2, cmap='classes')
-        ax_target_y.set_axis_off()
-    plt.savefig(os.path.join(outdir, os.path.splitext(os.path.basename(opts.weights))[0] + '-sorted.svg'))
-    plt.close()
+        clustering = hier.linkage(lweights, method='average')
+        order = hier.leaves_list(clustering)
+        ax = plt.gca()
+        if opts.truth != None:
+            divider = make_axes_locatable(ax)
+            ax_target_y = divider.append_axes("right", size=1.0, pad=-0.1, sharey=ax)
+        ax.imshow(lweights[np.ix_(order, order)])
+        if opts.truth != None:
+            meta, truth_ids, target = read_truthfile(opts.truth)
+            target -= 1
+            target[target < 0] = 255
+            target_full = np.zeros(len(order), dtype=np.uint8) + 255
+            for i, t in zip(truth_ids, target):
+                target_full[np.array(ids) == i] = t
+            target2 = np.zeros((20, len(target_full)), dtype=target_full.dtype)
+            target2[:] = target_full[np.ix_(order)]
+            target2 = target2.T
+            ax_target_y.imshow(target2, vmin=0, vmax=255, cmap='classes')
+            ax_target_y.set_axis_off()
+        plt.savefig(os.path.join(outdir, os.path.splitext(os.path.basename(opts.weights))[0] + '-sorted.svg'))
+        plt.close()
 
-    plt.imshow(weights)
+    if opts.truth != None:
+        mask = target_full != 255
+        target = target_full[mask]
+        ax = plt.gca()
+        divider = make_axes_locatable(ax)
+        ax_target_y = divider.append_axes("right", size=1.0, pad=0.1, sharey=ax)
+        ax.imshow(lweights[np.ix_(mask, mask)], interpolation='nearest')
+        target2 = np.zeros((2, len(target)), dtype=target.dtype)
+        target2[:] = target
+        target2 = target2.T
+        ax_target_y.imshow(target2, vmin=0, vmax=255, cmap='classes', interpolation='nearest')
+        ax_target_y.set_axis_off()
+        plt.savefig(os.path.join(outdir, os.path.splitext(os.path.basename(opts.weights))[0] + '-truth.svg'))
+        plt.close()
+
+    plt.imshow(lweights)
     plt.colorbar()
     plt.savefig(os.path.join(outdir, os.path.splitext(os.path.basename(opts.weights))[0] + '.svg'))
     plt.close()

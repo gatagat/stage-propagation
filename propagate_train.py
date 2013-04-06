@@ -4,6 +4,10 @@ import numpy as np
 import os
 import tempfile
 import time
+import sklearn
+import sklearn.cross_validation
+import sklearn.grid_search
+from joblib import Parallel, delayed
 
 import tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, read_listfile, read_truthfile, read_weightsfile, write_propagatorfile, clean_args, select
@@ -14,40 +18,35 @@ method_table = {
         'general': { 'function': lambda p, w, **kw: propagate_labels(p, w, method_name='general', **kw) }
         }
 
-import sklearn
-import sklearn.cross_validation
-import sklearn.grid_search
-
-from joblib import Parallel, delayed
-
 scoring_table = {
         'accuracy': sklearn.metrics.accuracy_score
         }
 
-def train(method_name, method_args, data, output_dir=None):
+def train(method_name, method_args, data, n_jobs=None, output_dir=None):
     args = method_args.copy()
     hyper_params = method_args['hyper_params']
     grid = sklearn.grid_search.ParameterGrid(dict(zip(hyper_params, [ args[p] for p in hyper_params ])))
     verbose = True
-
-    cv_results = Parallel(n_jobs=1, verbose=verbose,
+    if n_jobs == None:
+        n_jobs = 1
+    cv_results = Parallel(n_jobs=n_jobs, verbose=verbose,
         pre_dispatch='2*n_jobs')(
         delayed(fit_and_score)(
         d, method_name, args, propagate_params, verbose, output_dir)
         for propagate_params in grid for d in data)
         
     n_grid_points = len(list(grid))
-    n_fits = len(cv_results)
-    n_folds = n_fits // n_grid_points
     scores_mean = np.zeros(n_grid_points)
     scores_std = np.zeros(n_grid_points)
     params = []
     for i in range(n_grid_points):
-        grid_start = i * n_folds
-        scores = [score for score, _ in cv_results[grid_start:grid_start + n_folds]]
+        grid_start = i * len(data)
+        scores = [score[0] for score in cv_results[grid_start:grid_start + len(data)]]
         scores_mean[i] = np.mean(scores)
         scores_std[i] = np.std(scores)
         params += [cv_results[grid_start][1]]
+        for j in range(grid_start, grid_start + len(data)):
+            assert cv_results[j][1] == cv_results[grid_start][1]
     best_n = np.argmax(scores_mean) 
     # XXX: take model with smallest variance amongst the best
 
@@ -77,8 +76,10 @@ def fit_and_score(data, method_name, method_args, propagate_params, verbose, out
     propagated = propagate_fn(data['pred'], weights, labels=labels, output_dir=output_dir, **args)
     propagated = select(propagated, 'id', data['truth_ids'])
     logger.info('Using %d propagated samples with ground truth to evaluate', len(propagated))
+    assert len(propagated['pred']) == len(data['target'])
     score = scoring_table[method_args['scoring']](propagated['pred'], data['target'])
-    return score, propagate_params
+    cm = sklearn.metrics.confusion_matrix(data['target'], propagated['pred'], labels=sorted(labels.keys()))
+    return score, propagate_params, cm
 
 
 if __name__ == '__main__':
@@ -87,6 +88,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config', dest='config', required=False, action='store', default=None, help='Path to the config file')
     parser.add_argument('-m', '--method', dest='method', required=True, action='store', choices=method_table.keys(), default=None, help='Method name.')
     parser.add_argument('-a', '--args', dest='args', required=False, action='store', default=None, help='Method arguments file.')
+    parser.add_argument('-j', '--jobs', dest='jobs', required=False, action='store', default=None, type=int, help='Number of parallel processes.')
     parser.add_argument('-d', '--dissimilarities', dest='dissim', nargs='*', required=True, action='store', default=None, help='Dissimilarities file(s).')
     parser.add_argument('-p', '--predictions', dest='predictions', nargs='*', required=True, action='store', default=None, help='Predictions file(s).')
     parser.add_argument('-t', '--truth', dest='truth', nargs='*', required=True, action='store', default=None, help='Truth file(s).')
@@ -127,7 +129,7 @@ if __name__ == '__main__':
             'truth_ids': truth_ids,
             'target': target
         }]
-    args, model = train(opts.method, method_args, data, output_dir=outdir)
+    args, model = train(opts.method, method_args, data, n_jobs=opts.jobs, output_dir=outdir)
     args['random_generator_seed'] = seed
     clean_args(args)
     write_propagatorfile(os.path.join(outdir, 'propagator.dat'), {

@@ -1,2 +1,2 @@
 distance_factor: 200
-unserialized: [input_name, output_dir]
+unserialized: [n_jobs, input_name, output_dir]

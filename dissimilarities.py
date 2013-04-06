@@ -21,11 +21,13 @@ method_table = {
         }
 
 
-def compute_dissimilarity(method_name, method_args, data, input_name=None, output_dir=None):
+def compute_dissimilarity(method_name, method_args, data, n_jobs=None, input_name=None, output_dir=None):
     assert output_dir != None
     assert input_name != None
     args = method_args.copy()
-    args, D = method_table[method_name]['function'](data, output_dir=output_dir, input_name=input_name, **args)
+    if 'cache_dir' in args:
+        output_dir = args['cache_dir']
+    args, D = method_table[method_name]['function'](data, n_jobs=n_jobs, output_dir=output_dir, input_name=input_name, **args)
     cols = [str(i) for i in data['id']]
     dissim = np.core.records.fromarrays(
             [data['id']] + [D[:, i] for i in range(D.shape[1])],
@@ -40,6 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--method', dest='method', required=True, action='store', choices=method_table.keys(), default=None, help='Method name.')
     parser.add_argument('-a', '--args', dest='args', required=False, action='store', default=None, help='Arguments file.')
     parser.add_argument('-l', '--list', dest='list', required=True, action='store', default=None, help='List file.')
+    parser.add_argument('-j', '--jobs', dest='jobs', required=False, action='store', default=None, type=int, help='Number of parallel processes.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
     opts = parser.parse_args()
     if opts.output == None:
@@ -54,6 +57,6 @@ if __name__ == '__main__':
     args = meta
     if opts.args != None:
         args.update(read_argsfile(opts.args))
-    args, dissim = compute_dissimilarity(opts.method, args, data, output_dir=outdir, input_name=inputname)
+    args, dissim = compute_dissimilarity(opts.method, args, data, n_jobs=opts.jobs, output_dir=outdir, input_name=inputname)
     clean_args(args)
     write_listfile(os.path.join(outdir, inputname + '-dissim.csv'), dissim, input_name=inputname, **args)

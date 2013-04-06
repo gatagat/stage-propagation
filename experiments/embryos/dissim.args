@@ -1,0 +1,7 @@
+cache_dir: ..
+distance_name: '{OUT}/distances/{measure}-{rotation_invariance}-{normalized_width:04d}x{normalized_height:04d}/{INPUTNAME}-distances.dat'
+measure: NCClog
+normalized_height: 64
+normalized_width: 128
+rotation_invariance: true
+unserialized: []

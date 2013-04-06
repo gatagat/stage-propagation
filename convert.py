@@ -15,6 +15,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Converts CSV file into a listfile.')
     parser.add_argument('-p', '--prefix', dest='image_prefix', required=False, action='store', default=None, help='Path prefix of all image files.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
+    parser.add_argument('--outname-prefix', dest='outname_prefix', required=False, action='store', default=None, help='Output file prefix.')
     parser.add_argument('-t', '--truth', dest='truth', required=False, action='store', default=None, choices=['stage'], help='Truth column.')
     parser.add_argument('--no-timestamp', dest='no_timestamp', required=False, action='store_true', default=False, help='Do not suffix timestamp to the output filename.')
     parser.add_argument('csv_pattern', action='store', help='Wildcard matching input CSV files.')
@@ -56,14 +57,16 @@ if __name__ == '__main__':
     dst = np.array([], dtype=dtype)
     t = -1
     dirnames = []
-    for csvname in sorted(glob.glob(csv_pattern)):
+    csvnames = sorted(glob.glob(csv_pattern))
+    if  len(csvnames) == 0:
+        raise RuntimeError('No input files matching the pattern.')
+    for csvname in csvnames:
         label = os.path.splitext(os.path.basename(csvname))[0]
         if label.find('#') != -1:
             continue
         t = max(t, os.path.getmtime(csvname))
         src = csv2rec(csvname, delimiter=',', converterd=converterd)
         for sample in src:
-            dirnames += [sample['dirname']]
             sample_dirname = sample['dirname'].split('/')
             sample_date = sample_dirname[-2].split('-')
             if len(sample_date) > 1:
@@ -87,6 +90,7 @@ if __name__ == '__main__':
                 if sample_truth not in truth_labels.keys():
                     continue
                 dst_sample += [sample_truth]
+            dirnames += [sample['dirname']]
             dst = np.r_[dst, np.array([tuple(dst_sample)], dtype=dtype)]
     if len(np.unique(dirnames)) > 1:
         for i in range(len(dst)):
@@ -103,6 +107,8 @@ if __name__ == '__main__':
         out_name += 'data.csv'
     else:
         out_name += 'truth.csv'
+    if opts.outname_prefix != None:
+        out_name = opts.outname_prefix + out_name
     meta = {
         'mask_prefix': image_prefix,
         'image_prefix': image_prefix }

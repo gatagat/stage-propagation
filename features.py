@@ -23,10 +23,10 @@ method_table = {
         }
 
 
-def compute_features(method_name, method_args, data, output_dir=None):
+def compute_features(method_name, method_args, data, input_name=None, output_dir=None):
     cache = {}
     args = method_args.copy()
-    additional_args = method_table[method_name]['prepare'](data, output_dir=output_dir, **args)
+    additional_args = method_table[method_name]['prepare'](data, input_name=input_name, output_dir=output_dir, **args)
     args.update(additional_args)
     feature_names = args['feature_names']
     #del args['feature_names']
@@ -35,7 +35,7 @@ def compute_features(method_name, method_args, data, output_dir=None):
     d = len(feature_names)
     _f = np.zeros((N, d), dtype=np.float64)
     for i in range(N):
-        _f[i, :] = compute_fn(data[i], cache=cache, **args)
+        _f[i, :] = compute_fn(data[i], cache=cache, input_name=input_name, output_dir=output_dir, **args)
     features = np.core.records.fromarrays(
             [data['id']] + [_f[:, i] for i in range(_f.shape[1])],
             dtype=zip(['id'] + feature_names, [data.dtype['id']] + [np.float64] * d))
@@ -65,6 +65,6 @@ if __name__ == '__main__':
     args = meta
     if opts.args != None:
         args.update(read_argsfile(opts.args))
-    args, features = compute_features(opts.method, args, data, output_dir=outdir)
+    args, features = compute_features(opts.method, args, data, input_name=inputname, output_dir=outdir)
     clean_args(args)
     write_listfile(os.path.join(outdir, inputname + '-feats.csv'), features, input_name=inputname, **args)

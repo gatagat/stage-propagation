@@ -1,1 +1,2 @@
 IMAGE_PREFIX=/path/to/the/images
+N_JOBS=1

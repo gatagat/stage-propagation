@@ -51,17 +51,24 @@ if __name__ == '__main__':
     param_index = []
     for values in param_values:
         param_index += [ dict(zip(values, range(len(values)))) ]
-    data = np.zeros((len(param_index[0]), len(param_index[1])))
+    data_n = np.zeros((len(param_index[0]), len(param_index[1])))
+    data_mean = np.zeros((len(param_index[0]), len(param_index[1])))
     for score, params in cv_results:
-        data[param_index[0][params[param_names[0]]], param_index[1][params[param_names[1]]]] = score
+        i1 = param_index[0][params[param_names[0]]]
+        i2 = param_index[1][params[param_names[1]]]
+        data_mean[i1, i2] += score
+        data_n[i1, i2] += 1
+    for j in range(data_n.shape[0]):
+        for i in range(data_n.shape[1]):
+            data_mean[j, i] /= data_n[j, i]
     fig = plt.figure()
     plt.clf()
     ax = fig.add_subplot(111)
     ax.set_aspect(1)
-    res = ax.imshow(data, cmap=plt.cm.jet, origin='lower', interpolation='nearest')
+    res = ax.imshow(data_mean, cmap=plt.cm.jet, origin='lower', interpolation='nearest')
     for y in xrange(len(param_values[0])):
         for x in xrange(len(param_values[1])):
-            ax.annotate('%.2f' % data[y][x], xy=(x, y),
+            ax.annotate('%.2f' % data_mean[y][x], xy=(x, y),
                         horizontalalignment='center',
                         verticalalignment='center', size='small')
     plt.ylabel(param_names[0])

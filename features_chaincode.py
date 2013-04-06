@@ -207,13 +207,15 @@ def train_dictionary(chaincodes, labels=None, **kwargs):
     return dictionary, counts
 
 
-def prepare_chaincode_features(data, dictionary_name=None, bow_options_name=None, **kwargs):
+def prepare_chaincode_features(data, dictionary_name=None, bow_options_name=None, input_name=None, output_dir=None, **kwargs):
     assert bow_options_name != None
     assert dictionary_name != None
+    assert input_name != None
+    assert output_dir != None
 
     bow_options = tsh.deserialize(bow_options_name)
 
-    dictionary_name = dictionary_name.format(OUT=kwargs['output_dir'])
+    dictionary_name = dictionary_name.format(OUT=output_dir)
     ret = { 'bow_options': bow_options, 'dictionary_name': dictionary_name }
     if os.path.exists(dictionary_name):
         ret.update(tsh.deserialize(dictionary_name))
@@ -231,8 +233,8 @@ def prepare_chaincode_features(data, dictionary_name=None, bow_options_name=None
         scale_name = 'cc%02d' % scale
         for i in range(len(data)):
             chaincodes[i][scale_name] = get_chaincode_from_image(os.path.join(mask_prefix, data[i]['mask']), scale)
-    tsh.serialize(os.path.join(kwargs['output_dir'], 'chaincodes.dat'), chaincodes)
-    lpname = os.path.join(kwargs['output_dir'], 'lp.dat')
+    tsh.serialize(os.path.join(output_dir, input_name + '-chaincodes.dat'), chaincodes)
+    lpname = os.path.join(output_dir, input_name + '-lp.dat')
     dictionary = dict(zip(
         ['dictionary', 'counts'],
         train_dictionary(chaincodes, lpname=lpname, labels=data[kwargs['truth']], **bow_options)))
