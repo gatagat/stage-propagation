@@ -28,7 +28,7 @@ if __name__ == '__main__':
     propagator = read_propagatorfile(opts.model)
     cv_results = propagator['meta']['cv_results']
     data = {}
-    for score, params in cv_results:
+    for score, params, cm in cv_results:
         key = tuple(params.items())
         if key not in data:
             data[key] = []
@@ -47,13 +47,13 @@ if __name__ == '__main__':
     assert len(param_names) == 2
     param_values = []
     for name in param_names:
-        param_values += [ np.unique([ params[name] for _, params in cv_results ]) ]
+        param_values += [ np.unique([ params[name] for _, params, _ in cv_results ]) ]
     param_index = []
     for values in param_values:
         param_index += [ dict(zip(values, range(len(values)))) ]
     data_n = np.zeros((len(param_index[0]), len(param_index[1])))
     data_mean = np.zeros((len(param_index[0]), len(param_index[1])))
-    for score, params in cv_results:
+    for score, params, cm in cv_results:
         i1 = param_index[0][params[param_names[0]]]
         i2 = param_index[1][params[param_names[1]]]
         data_mean[i1, i2] += score

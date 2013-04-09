@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import heapq
 import numpy as np
 import tempfile
 import os
@@ -27,13 +28,34 @@ def compute_dissimilarity(method_name, method_args, data, n_jobs=None, input_nam
     args = method_args.copy()
     if 'cache_dir' in args:
         output_dir = args['cache_dir']
-    args, D = method_table[method_name]['function'](data, n_jobs=n_jobs, output_dir=output_dir, input_name=input_name, **args)
-    cols = [str(i) for i in data['id']]
-    dissim = np.core.records.fromarrays(
-            [data['id']] + [D[:, i] for i in range(D.shape[1])],
-            dtype=zip(['id'] + cols, [data.dtype['id']] + [np.float64] * len(cols)))
-    return args, dissim
+    return method_table[method_name]['function'](data, n_jobs=n_jobs, output_dir=output_dir, input_name=input_name, **args)
 
+def threshold_nearest(w, knn=5, symmetric=None, **kwargs):
+    keep = np.zeros(w.shape, dtype=bool)
+    for j in range(w.shape[0]):
+        keep[j, heapq.nsmallest(knn, range(w.shape[1]), key=lambda ind: w[j, ind])] = True
+    if symmetric == 'union':
+        keep = keep + keep.T
+    elif symmetric == 'intersection':
+        keep = keep * keep.T
+    w[np.logical_not(keep)] = np.inf
+    return w
+
+threshold_method_table = {
+        'knn': { 'function': threshold_nearest }
+        }
+
+def threshold_dissimilarity(method_name, method_args, w):
+    args = method_args.copy()
+    threshold_method_table[method_name]['function'](w, **args)
+    return args, w
+
+def prepare_weights_data(ids, id_dtype, w):
+    cols = [str(i) for i in ids]
+    dissim = np.core.records.fromarrays(
+            [ids] + [w[:, i] for i in range(w.shape[1])],
+            dtype=zip(['id'] + cols, [id_dtype] + [np.float64] * len(cols)))
+    return dissim
 
 if __name__ == '__main__':
     import argparse
@@ -57,6 +79,9 @@ if __name__ == '__main__':
     args = meta
     if opts.args != None:
         args.update(read_argsfile(opts.args))
-    args, dissim = compute_dissimilarity(opts.method, args, data, n_jobs=opts.jobs, output_dir=outdir, input_name=inputname)
+    args, w = compute_dissimilarity(opts.method, args, data, n_jobs=opts.jobs, output_dir=outdir, input_name=inputname)
+    if 'threshold' in args and args['threshold'] != 'False':
+        args, w = threshold_dissimilarity(args['threshold'], args, w)
+    dissim = prepare_weights_data(data['id'], data.dtype['id'], w)
     clean_args(args)
     write_listfile(os.path.join(outdir, inputname + '-dissim.csv'), dissim, input_name=inputname, **args)

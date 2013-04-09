@@ -52,4 +52,5 @@ if __name__ == '__main__':
     args.update(model['propagator'])
     args, prop = propagate(method_name, args, predictions, dissim, output_dir=outdir)
     clean_args(args)
+    del args['cv_results']
     write_listfile(os.path.join(outdir, inputname + '-propagated.csv'), prop, **args)

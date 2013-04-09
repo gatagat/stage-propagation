@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean cl-train pr-train test local-images
 
 .SECONDARY: 
 
@@ -21,36 +21,42 @@ CONVERT_TRUTH=$(BASE)/convert.py --truth=stage --no-timestamp
 CONVERT=$(BASE)/convert.py --no-timestamp 
 LOCAL_COPY=$(BASE)/copy_images.py
 PLOT_WEIGHTS=$(BASE)/plot_weights.py
-DISSIM_THRESH=$(BASE)/dissimilarities_thresh.py
 VIZU_KNN=$(BASE)/vizu_knn.py
 
+PR_TRAIN_DATAS:=$(PR_TRAIN_DATA:%=%-data.csv)
 PR_TRAIN_DISSIMS:=$(PR_TRAIN_DATA:%=%-data-dissim.csv)
-PR_TRAIN_TRUTH:=$(PR_TRAIN_DATA:%=%-truth.csv)
+PR_TRAIN_TRUTHS:=$(PR_TRAIN_DATA:%=%-truth.csv)
 PR_TRAIN_PREDS:=$(PR_TRAIN_DATA:%=%-data-predictions.csv)
 PR_TRAIN_PROPS:=$(PR_TRAIN_DATA:%=%-data-propagated.csv)
 
+PR_TEST_TRUTHS:=$(PR_TEST_DATA:%=%-truth.csv)
+PR_TEST_PREDS:=$(PR_TEST_DATA:%=%-data-predictions.csv)
+PR_TEST_PROPS:=$(PR_TEST_DATA:%=%-data-propagated.csv)
+
 all: predictions-cm.svg propagator-cv.svg propagated-cm.svg plot-weights
+
+cl-train: classifier.dat
+pr-train: propagator.dat
+test: predictions-test-cm.svg propagated-test-cm.svg
+truths: $(PR_TRAIN_TRUTHS)
+feats: $(PR_TRAIN_DATA:%=%-truth-feats.csv) $(PR_TRAIN_DATA:%=%-data-feats.csv)
+predictions: $(PR_TRAIN_PREDS)
+propagated: $(PR_TRAIN_PROPS)
+data: $(PR_TRAIN_DATAS)
+weights: $(PR_TRAIN_DATA:%=%-data-dissim.csv)
+plot-weights: $(PR_TRAIN_DATA:%=%-data-dissim.svg)
+errors: $(PR_TRAIN_DATA:%=%-data-errors.html)
 
 clean:
 	rm -f classifier.dat propagator.dat 2>/dev/null
 	rm -f lp.dat chaincodes.dat dictionary.dat 2>/dev/null
 	rm -f *.svg 2>/dev/null
+	rm -f *.html *.txt 2>/dev/null
 	rm -f *-predictions.csv *-propagated.csv *-feats.csv *-truth.csv *-data.csv *-dissim.csv *-distances.dat 2>/dev/null
 
-local-images: $(PR_TRAIN_DATA:%=%-data.csv)
+local-images: $(PR_ALL_DATA:%=%-data.csv)
 	$(LOCAL_COPY) -r ~/vt_project/Segmentation/Fine/MetaSys/ -o ../images/ $^
 	ln -s ../images/ image
-
-truths: $(PR_TRAIN_TRUTH)
-feats: $(PR_TRAIN_DATA:%=%-truth-feats.csv) $(PR_TRAIN_DATA:%=%-data-feats.csv)
-predictions: $(PR_TRAIN_PREDS)
-propagated: $(PR_TRAIN_PROPS)
-data: $(PR_TRAIN_DATA:%=%-data.csv)
-weights: $(PR_TRAIN_DATA:%=%-data-dissim.csv)
-plot-weights: $(PR_TRAIN_DATA:%=%-data-dissim.svg)
-
-threshold-weights: $(PR_TRAIN_DATA:%=%-data-dissim.csv)
-	for file in $^; do $(DISSIM_THRESH) -m knn -d $$file; done
 
 SpecificStages-truth.csv: truth/SpecificStages*.csv
 	$(CONVERT_TRUTH) --no-timestamp -p $(IMAGE_PREFIX) -o . 'truth/SpecificStages*.csv'
@@ -83,8 +89,11 @@ classifier.dat: $(CL_TRAIN_DATA)-truth.csv $(CL_TRAIN_DATA)-truth-feats.csv svm.
 %-predictions.csv: %.csv classifier.dat
 	$(CL_PREDICT) -l $< -m classifier.dat -o .
 
-predictions-cm.svg: $(PR_TRAIN_PREDS) $(PR_TRAIN_TRUTH)
-	$(EVALUATE) --all-prefix=predictions -p $(PR_TRAIN_PREDS) -t $(PR_TRAIN_TRUTH) -o .
+predictions-cm.svg: $(PR_TRAIN_PREDS) $(PR_TRAIN_TRUTHS)
+	$(EVALUATE) --all-prefix=predictions -p $(PR_TRAIN_PREDS) -t $(PR_TRAIN_TRUTHS) -o .
+
+predictions-test-cm.svg: $(PR_TEST_PREDS) $(PR_TEST_TRUTHS)
+	$(EVALUATE) --all-prefix=predictions-test -p $(PR_TEST_PREDS) -t $(PR_TEST_TRUTHS) -o .
 
 %-data-predictions-cm.svg: %-data-predictions.csv %-truth.csv
 	$(EVALUATE) -p $*-data-predictions.csv -t $*-truth.csv -o .
@@ -95,8 +104,8 @@ predictions-cm.svg: $(PR_TRAIN_PREDS) $(PR_TRAIN_TRUTH)
 %-data-dissim.svg: %-data-dissim.csv %-truth.csv
 	$(PLOT_WEIGHTS) -w $< -o . -t $*-truth.csv
 
-propagator.dat: $(PR_TRAIN_DISSIMS) $(PR_TRAIN_TRUTH) $(PR_TRAIN_PREDS) harmonic.args
-	$(PR_TRAIN) -m harmonic -a harmonic.args -t $(PR_TRAIN_TRUTH) -d $(PR_TRAIN_DISSIMS) -p $(PR_TRAIN_PREDS) -o .
+propagator.dat: $(PR_TRAIN_DISSIMS) $(PR_TRAIN_TRUTHS) $(PR_TRAIN_PREDS) harmonic.args
+	$(PR_TRAIN) -m harmonic -a harmonic.args -t $(PR_TRAIN_TRUTHS) -d $(PR_TRAIN_DISSIMS) -p $(PR_TRAIN_PREDS) -o .
 
 propagator-cv.svg: propagator.dat
 	$(PLOT_CV) -m propagator.dat -o .
@@ -104,8 +113,11 @@ propagator-cv.svg: propagator.dat
 %-propagated.csv: %-dissim.csv %-predictions.csv propagator.dat
 	$(PR_PREDICT) -m propagator.dat -d $*-dissim.csv -p $*-predictions.csv -o .
 
-propagated-cm.svg: $(PR_TRAIN_PROPS) $(PR_TRAIN_TRUTH)
-	$(EVALUATE) --all-prefix=propagated -p $(PR_TRAIN_PROPS) -t $(PR_TRAIN_TRUTH) -o .
+propagated-cm.svg: $(PR_TRAIN_PROPS) $(PR_TRAIN_TRUTHS)
+	$(EVALUATE) --all-prefix=propagated -p $(PR_TRAIN_PROPS) -t $(PR_TRAIN_TRUTHS) -o .
+
+propagated-test-cm.svg: $(PR_TEST_PROPS) $(PR_TEST_TRUTHS)
+	$(EVALUATE) --all-prefix=propagated-test -p $(PR_TEST_PROPS) -t $(PR_TEST_TRUTHS) -o .
 
 %-data-propagated-cm.svg: %-data-propagated.csv %-truth.csv
 	$(EVALUATE) -p $*-data-propagated.csv -t $*-truth.csv -o .
@@ -113,10 +125,8 @@ propagated-cm.svg: $(PR_TRAIN_PROPS) $(PR_TRAIN_TRUTH)
 %-data-neighbors.html: %-data.csv %-data-dissim.csv %-truth.csv %-data-predictions.csv %-data-propagated.csv
 	$(VIZU_KNN) -l $*-data.csv -d $*-data-dissim.csv -t $*-truth.csv -p $*-data-predictions.csv -q $*-data-propagated.csv -o .
 
-errors: $(PR_TRAIN_DATA:%=%-data-errors.html)
-
 %-data-errors.html: %-data.csv %-data-dissim.csv %-truth.csv %-data-predictions.csv %-data-propagated.csv
 	$(VIZU_KNN) --only-errors -l $*-data.csv -d $*-data-dissim.csv -t $*-truth.csv -p $*-data-predictions.csv -q $*-data-propagated.csv -o .
 
 errors-neighbors.html:
-	$(VIZU_KNN) --only-errors -l $(PR_TRAIN_DATA:%=%-data.csv) -d $(PR_TRAIN_DISSIMS) -t $(PR_TRAIN_TRUTH) -p $(PR_TRAIN_PREDS) -q $(PR_TRAIN_PROPS) -o .
+	$(VIZU_KNN) --only-errors -l $(PR_TRAIN_DATAS) -d $(PR_TRAIN_DISSIMS) -t $(PR_TRAIN_TRUTHS) -p $(PR_TRAIN_PREDS) -q $(PR_TRAIN_PROPS) -o .

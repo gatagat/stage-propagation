@@ -1,0 +1,3 @@
+#!/bin/sh
+
+~/projs/VT/experiments/e130117_iccv/annotators.py -n 'Annotator ek' -m 'Annotator ts' -a Sampled-ek_20130311-rescan_019748~A-truth.csv Sampled-ek_20130311-rescan_043140~A-truth.csv Sampled-ek_20130311-rescan_045650~A-truth.csv Sampled-ek_20130311_010055-truth.csv Sampled-ek_20130311_012761-truth.csv Sampled-ek_20130311_019914-truth.csv -b Sampled-ts_20130311-rescan_019748~A-truth.csv Sampled-ts_20130311-rescan_043140~A-truth.csv Sampled-ts_20130311-rescan_045650~A-truth.csv Sampled-ts_20130311_010055-truth.csv Sampled-ts_20130311_012761-truth.csv Sampled-ts_20130311_019914-truth.csv

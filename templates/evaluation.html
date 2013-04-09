@@ -1,59 +1,69 @@
 <html>
 <head>
- <link rel="stylesheet" type="text/css" href="static/style.css"/>
- <script type="text/javascript" src="static/sorttable.js"></script>
+<link rel="stylesheet" type="text/css" href="static/style.css"/>
+<script type="text/javascript" src="static/sorttable.js"></script>
 </head>
 <body>
-    <h1>{{ title }}</h1>
-    <img src="{{ cm }}" width="520px">
-    <div>
-        <h2>ROC curves</h2>
-        {% for curve in roccurves %}
-	<img src="{{ curve }}" width="420px">
-        {% endfor %}
-    </div>
-
-    <div>
-        <h2>Precision-Recall curves</h2>
-        {% for curve in prcurves %}
-	<img src="{{ curve }}" width="420px">
-        {% endfor %}
-    </div>
-
-    {% if samples %}
-    <div>
-	<table class='sortable'>
-	<tr><th>ID</th><th>Image</th><th>Mask</th><th>Expression</th><th>Truth</th><th>Predicted</th><th>Correct</th></tr>
-        {% for s in samples %}
-        <tr>
-            <td>{{ s.id }}</td>
-            <td><img src="{{ s.image }}" width="160px"></td>
-            <td><img src="{{ s.mask }}" width="160px"></td>
-            <td><img src="{{ s.expr }}" width="160px"></td>
-            <td>{{ s.truth }}</td>
-            <td>{{ s.prediction }}</td>
-            <td>{% if s.truth == s.prediction %}1{% else %}0{% endif %}</td>
-        </tr>
-        {% endfor %}
-    </div>
-    <div>
-	<table class='sortable'>
-	<tr><th>ID</th><th>Predicted</th></tr>
-        {% for p in predictions %}
-        <tr>
-            <td>{{ p.id }}</td>
-            <td>{{ p.pred }}</td>
-        </tr>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    {% if datasets %}
-    <div>
+<h1>{{ title }}</h1>
+<img src="{{ cm }}" width="520px">
 	    <table class='sortable'>
-	    <tr><th>Dataset</th><th>Accuracy</th></tr>
+            <tr><th>Label</th><th>Accuracy</th></tr>
+            {% for n, l in label_accuracy %}
+            <tr><td>{{ labels[n] }}</td><td>{{ l }}</td></tr>
+            {% endfor %}
+	    </table>
+<div>
+    <h2>ROC curves</h2>
+    {% for curve in roccurves %}
+<img src="{{ curve }}" width="420px">
+    {% endfor %}
+</div>
+
+<div>
+    <h2>Precision-Recall curves</h2>
+    {% for curve in prcurves %}
+<img src="{{ curve }}" width="420px">
+    {% endfor %}
+</div>
+
+{% if samples %}
+<div>
+<table class='sortable'>
+<tr><th>ID</th><th>Image</th><th>Mask</th><th>Expression</th><th>Truth</th><th>Predicted</th><th>Correct</th></tr>
+    {% for s in samples %}
+    <tr>
+        <td>{{ s.id }}</td>
+        <td><img src="{{ s.image }}" width="160px"></td>
+        <td><img src="{{ s.mask }}" width="160px"></td>
+        <td><img src="{{ s.expr }}" width="160px"></td>
+        <td>{{ s.truth }}</td>
+        <td>{{ s.prediction }}</td>
+        <td>{% if s.truth == s.prediction %}1{% else %}0{% endif %}</td>
+    </tr>
+    {% endfor %}
+</div>
+<div>
+<table class='sortable'>
+<tr><th>ID</th><th>Predicted</th></tr>
+    {% for p in predictions %}
+    <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.pred }}</td>
+    </tr>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if datasets %}
+<div>
+    <table class='sortable'>
+            <tr><th>Dataset</th><th>Sample accuracy</th>
+                {% for n in label_nums %}<th>{{ labels[n] }} accuracy</th>{% endfor %}
+            </tr>
 	    {% for d in datasets %}
-	    <tr><td><a href="{{ d.url }}">{{ d.label }}</a></td><td>{{ d.accuracy }}</td></tr>
+        <tr><td><a href="{{ d.url }}">{{ d.label }}</a></td><td>{{ d.accuracy }}</td>
+                {% for l in d.label_accuracy %}<td>{{ l }}</td>{% endfor %}
+        </tr>
 	    {% endfor %}
 	    </table>
     </div>

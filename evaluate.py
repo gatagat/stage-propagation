@@ -15,7 +15,7 @@ import tsh; logger = tsh.create_logger(__name__)
 from utils import read_listfile, read_truthfile, select
 
 def create_roc_curve(true, prob):
-    if true.any():
+    if true.any() and not true.all():
         fpr, tpr, _ = sklearn.metrics.roc_curve(true, prob)
         return fpr, tpr
     else:
@@ -43,7 +43,7 @@ def plot_roc_curve(fpr, tpr, title=None, filename=None):
         plt.close()
 
 def create_prc_curve(true, prob, title=None, filename=None):
-    if true.any():
+    if true.any() and not true.all():
         precision, recall, _ = sklearn.metrics.precision_recall_curve(true, prob)
         # XXX: get rid of the precision = 1 for recall = 0
         if len(precision) > 1:
@@ -98,7 +98,7 @@ def average_curves(x, y, n=1000):
    return average_x, average_y
 
 
-def process(pred_filename, truth_filename, fprs=None, tprs=None, precisions=None, recalls=None, cms=None, accs=None):
+def process(pred_filename, truth_filename, fprs=None, tprs=None, precisions=None, recalls=None, cms=None, accs=None, label_accs=None):
     predname = os.path.splitext(os.path.basename(pred_filename))[0]
     truth_meta, truth_ids, truth = read_truthfile(truth_filename)
     pred_meta, all_pred = read_listfile(pred_filename)
@@ -141,14 +141,19 @@ def process(pred_filename, truth_filename, fprs=None, tprs=None, precisions=None
     sorted_class_labels = tsh.dict_values(labels, sorted_class_nums)
     cm = sklearn.metrics.confusion_matrix(truth, pred['pred'], labels=sorted_class_nums)
     acc = (np.diag(cm).sum() / float(np.sum(cm)))
+    label_acc = np.diagonal(cm).astype(np.float64) / np.sum(cm, axis=1).astype(np.float64)
+    label_avg_acc = np.nansum(label_acc) / np.sum(np.isfinite(label_acc))
     tsh.plot_confusion_matrix(cm, labels=sorted_class_labels)
-    plt.title('Accuracy: %.2f' % acc)
-    print 'Accuracy: %.2f' % acc
-    with open(os.path.join(outdir, predname + '.txt'), 'w') as f:
-        f.write('Accuracy: %.3f\n' % acc)
+    plt.title('Sample accuracy: %.2f, label accuracy: %.2f' % (acc, label_avg_acc))
     cmname = os.path.join(outdir, predname + '-cm.svg')
     plt.savefig(cmname)
     plt.close()
+
+    print 'Sample accuracy: %.2f, label accuracy: %.2f' % (acc, label_avg_acc)
+    with open(os.path.join(outdir, predname + '.txt'), 'w') as f:
+        for i in range(len(sorted_class_nums)):
+            f.write('%s accuracy: %3f\n' % (labels[sorted_class_nums[i]], label_acc[i]))
+        f.write('Sample accuracy: %.3f, label accuracy: %.3f\n' % (acc, label_avg_acc))
 
     samples = []
     truth_meta, truth = read_listfile(truth_filename)
@@ -163,10 +168,11 @@ def process(pred_filename, truth_filename, fprs=None, tprs=None, precisions=None
     template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
     env = Environment(loader=FileSystemLoader(template_dir))
     open(os.path.join(outdir, predname + '.html'), 'w').write(env.get_template('evaluation.html').render(
-            title=predname + ' ' + truth_name, cm=cmname, roccurves=roccurves, prcurves=prcurves, samples=samples, predictions=all_pred))
+            title=predname + ' ' + truth_name, cm=cmname, roccurves=roccurves, prcurves=prcurves, samples=samples, predictions=all_pred, accuracy=acc, label_accuracy=zip(sorted_class_nums, label_acc), label_nums=sorted_class_nums, labels=labels))
 
     cms += [cm]
     accs += [acc]
+    label_accs += [label_acc]
 
 if __name__ == '__main__':
     import argparse
@@ -189,6 +195,7 @@ if __name__ == '__main__':
     truth_meta, _, _= read_truthfile(opts.truth[0])
     truth_name = truth_meta['truth']
     labels = truth_meta[truth_name + '_labels']
+    sorted_class_nums = sorted(labels.keys())
 
     all_fprs = dict(zip(labels.keys(), [[] for _ in labels.keys()]))
     all_tprs = dict(zip(labels.keys(), [[] for _ in labels.keys()]))
@@ -196,14 +203,13 @@ if __name__ == '__main__':
     all_recalls = dict(zip(labels.keys(), [[] for _ in labels.keys()]))
     all_cms = []
     all_accs = []
+    all_label_accs = []
     datasets = []
     for pred_filename, truth_filename in zip(opts.predictions, opts.truth):
         logger.info('Prediction: %s, truth: %s', pred_filename, truth_filename)
-        accs = []
-        process(pred_filename, truth_filename, fprs=all_fprs, tprs=all_tprs, precisions=all_precisions, recalls=all_recalls, cms=all_cms, accs=accs)
-        all_accs += accs
+        process(pred_filename, truth_filename, fprs=all_fprs, tprs=all_tprs, precisions=all_precisions, recalls=all_recalls, cms=all_cms, accs=all_accs, label_accs=all_label_accs)
         predname = os.path.splitext(os.path.basename(pred_filename))[0]
-        datasets += [{'url': predname + '.html', 'label': predname, 'accuracy': np.mean(accs)}]
+        datasets += [{'url': predname + '.html', 'label': predname, 'accuracy': all_accs[-1], 'label_accuracy': all_label_accs[-1]}]
 
     if opts.all_prefix == None:
         if len(opts.predictions) == 1:
@@ -266,15 +272,18 @@ if __name__ == '__main__':
     prcurves += [prname]
 
     cm = np.sum(all_cms, axis=0)
-    avg_acc = np.mean(all_accs)
-    acc = (np.diag(cm).sum() / float(np.sum(cm)))
-    sorted_class_nums = sorted(labels.keys())
+    set_acc = np.mean(all_accs)
+    sample_acc = (np.diag(cm).sum() / float(np.sum(cm)))
+    label_acc = np.array(all_label_accs, dtype=np.float64)
+    label_acc[np.isinf(label_acc)] = np.nan
+    label_acc = np.nansum(label_acc, axis=0) / np.sum(np.isfinite(label_acc), axis=0)
+    label_avg_acc = np.nansum(label_acc) / np.sum(np.isfinite(label_acc))
     sorted_class_labels = tsh.dict_values(labels, sorted_class_nums)
     tsh.plot_confusion_matrix(cm, labels=sorted_class_labels)
-    plt.title('Accuracy: %.3f, datasets average accuracy: %.3f' % (acc, avg_acc))
-    print all_prefix + ' accuracy: %.3f, average: %.3f' % (acc, avg_acc)
+    plt.title('Sample accuracy: %.3f, label accuracy: %.3f, set accuracy: %.3f' % (sample_acc, label_avg_acc, set_acc))
+    print all_prefix + ': Sample accuracy: %.3f, label accuracy: %.3f, set accuracy: %.3f' % (sample_acc, label_avg_acc, set_acc)
     with open(os.path.join(outdir, all_prefix + '.txt'), 'w') as f:
-        f.write('Accuracy: %.3f, datasets average accuracy: %.3f\n' % (acc, avg_acc))
+        f.write('Sample accuracy: %.3f, label accuracy: %.3f, set accuracy: %.3f\n' % (sample_acc, label_avg_acc, set_acc))
     cmname = os.path.join(outdir, all_prefix + '-cm.svg')
     plt.savefig(cmname)
     plt.close()
@@ -282,5 +291,5 @@ if __name__ == '__main__':
     template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
     env = Environment(loader=FileSystemLoader(template_dir))
     open(os.path.join(outdir, all_prefix + '-evaluation.html'), 'w').write(env.get_template('evaluation.html').render(
-            title=all_prefix, cm=cmname, roccurves=roccurves, prcurves=prcurves, datasets=datasets, samples=None, predictions=None))
+            title=all_prefix, cm=cmname, roccurves=roccurves, prcurves=prcurves, label_nums=sorted_class_nums, labels=labels, datasets=datasets, samples=None, predictions=None))
 

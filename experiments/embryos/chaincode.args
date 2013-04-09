@@ -1,3 +1,3 @@
-bow_options_name: bow-s2-4-8-w8-1000-vq3-norm-sqrt-cache-nofine-tfidf-classes.dat
+bow_options_name: bow-s2-4-8-w8-5000-vq3-norm-sqrt-cache-nofine-tfidf-classes.dat
 dictionary_name: '{OUT}/dictionary.dat'
 unserialized: [dictionary, counts, bow_options, mask_prefix, truth, stage_labels]
