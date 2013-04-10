@@ -89,14 +89,14 @@ def propagate_labels(predictions, weights, method_name=None, labels=None, output
     prop = np.zeros((len(predictions), len(labels)), dtype=float)
     for class_num, class_label in labels.items():
         confidence_name = 'prob%d' % class_num
-        confidences = predictions[confidence_name]
         if method_name == 'general':
             propagate_fn = _solve_binary
             predicted_labels = (predictions['pred'] == class_num).astype(float)*2 - 1
+            confidences = predictions[confidence_name]
         else:
             propagate_fn =_solve_binary_harmonic_function
             predicted_labels = (predictions['pred'] == class_num).astype(float)
-            confidences *= kwargs['unary_weight']
+            confidences = kwargs['unary_weight'] * predictions[confidence_name]
         prop[:, i] = propagate_fn(predicted_labels, confidences, weights, **kwargs)
         i += 1
     pred = prop.argmax(axis=1)

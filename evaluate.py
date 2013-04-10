@@ -157,18 +157,19 @@ def process(pred_filename, truth_filename, fprs=None, tprs=None, precisions=None
 
     samples = []
     truth_meta, truth = read_listfile(truth_filename)
-    for t in truth:
-        samples += [{
-            'id': t['id'],
-            'image': os.path.join('image', os.path.relpath(os.path.join(truth_meta['image_prefix'], t['image']), '/home/imp/kazmar/vt_project/Segmentation/Fine/MetaSys/')),
-            'mask': os.path.join('image', os.path.relpath(os.path.join(truth_meta['mask_prefix'], t['mask']), '/home/imp/kazmar/vt_project/Segmentation/Fine/MetaSys/')),
-            'expr': os.path.join('expr', 'expr%d.png' % t['id']),
-            'truth': labels[t[truth_name]],
-            'prediction': labels[pred['pred'][truth['id'] == t['id']][0]] }]
-    template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-    env = Environment(loader=FileSystemLoader(template_dir))
-    open(os.path.join(outdir, predname + '.html'), 'w').write(env.get_template('evaluation.html').render(
-            title=predname + ' ' + truth_name, cm=cmname, roccurves=roccurves, prcurves=prcurves, samples=samples, predictions=all_pred, accuracy=acc, label_accuracy=zip(sorted_class_nums, label_acc), label_nums=sorted_class_nums, labels=labels))
+    if 'image_prefix' in truth_meta:
+        for t in truth:
+            samples += [{
+                'id': t['id'],
+                'image': os.path.join('image', os.path.relpath(os.path.join(truth_meta['image_prefix'], t['image']), '/home/imp/kazmar/vt_project/Segmentation/Fine/MetaSys/')),
+                'mask': os.path.join('image', os.path.relpath(os.path.join(truth_meta['mask_prefix'], t['mask']), '/home/imp/kazmar/vt_project/Segmentation/Fine/MetaSys/')),
+                'expr': os.path.join('expr', 'expr%d.png' % t['id']),
+                'truth': labels[t[truth_name]],
+                'prediction': labels[pred['pred'][truth['id'] == t['id']][0]] }]
+        template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+        env = Environment(loader=FileSystemLoader(template_dir))
+        open(os.path.join(outdir, predname + '.html'), 'w').write(env.get_template('evaluation.html').render(
+                title=predname + ' ' + truth_name, cm=cmname, roccurves=roccurves, prcurves=prcurves, samples=samples, predictions=all_pred, accuracy=acc, label_accuracy=zip(sorted_class_nums, label_acc), label_nums=sorted_class_nums, labels=labels))
 
     cms += [cm]
     accs += [acc]

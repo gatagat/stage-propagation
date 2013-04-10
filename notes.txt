@@ -3,9 +3,3 @@
   - 0.73 for sigma=0.8
   - 0.59 for sigma=1 and 3classes
   - 0.65 for sigma=0.8 and 3classes
-
-- cross-validation is not necessary for evaluation of label propagation - just pick the best performing params on the validation set (train_propagation) - this should be unbiased since i am not using it in the training - and hope that it performs well on the test set
-
-- adapt test/validation evaluation to cases where only a fraction of the data is labelled!
-
-- label!

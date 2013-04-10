@@ -75,9 +75,9 @@ def fit_and_score(data, method_name, method_args, propagate_params, verbose, out
     propagate_fn = method_table[method_name]['function']
     propagated = propagate_fn(data['pred'], weights, labels=labels, output_dir=output_dir, **args)
     propagated = select(propagated, 'id', data['truth_ids'])
-    logger.info('Using %d propagated samples with ground truth to evaluate', len(propagated))
     assert len(propagated['pred']) == len(data['target'])
     score = scoring_table[method_args['scoring']](propagated['pred'], data['target'])
+    logger.info('%s: %d propagated samples with ground truth yielded: %.3f', str(propagate_params), len(propagated), score)
     cm = sklearn.metrics.confusion_matrix(data['target'], propagated['pred'], labels=sorted(labels.keys()))
     return score, propagate_params, cm
 

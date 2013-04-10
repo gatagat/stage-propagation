@@ -8,7 +8,18 @@ import os
 
 import tsh; logger = tsh.create_logger(__name__)
 from utils import read_listfile
-from class_colors import colors
+from colormaps import get_synthetic_colors
+
+matplotlib.rcParams['svg.fonttype'] = 'none'
+matplotlib.rcParams['savefig.bbox'] = 'tight'
+matplotlib.rcParams['savefig.pad_inches'] = 0.01
+matplotlib.rcParams['figure.figsize'] = (2, 2)
+matplotlib.rcParams['figure.subplot.left'] = 0.125
+matplotlib.rcParams['figure.subplot.right'] = 0.9
+matplotlib.rcParams['figure.subplot.bottom'] = 0.1
+matplotlib.rcParams['figure.subplot.top'] = 0.9
+
+extension = '.svg'
 
 if __name__ == '__main__':
     import argparse
@@ -16,6 +27,10 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config', dest='config', required=False, action='store', default=None, help='Path to the config file')
     parser.add_argument('-x', dest='x_feature', required=True, action='store', default=None, help='X-axis feature.')
     parser.add_argument('-y', dest='y_feature', required=True, action='store', default=None, help='Y-axis feature.')
+    parser.add_argument('--x-label', dest='x_label', required=False, action='store', default=None, help='X-axis label.')
+    parser.add_argument('--y-label', dest='y_label', required=False, action='store', default=None, help='Y-axis label.')
+    parser.add_argument('--no-y-ticks', dest='no_y_ticks', required=False, action='store_true', default=False, help='Do not put ticks on Y-axis.')
+    parser.add_argument('--legend', dest='legend', required=False, action='store_true', default=False, help='Plot legend.')
     parser.add_argument('-t', '--truth', dest='truth', required=False, action='store', default=None, help='Truth file.')
     parser.add_argument('-p', '--pred', dest='pred', required=False, action='store', default=None, help='Prediction file.')
     parser.add_argument('-l', '--list', dest='list', required=False, action='store', default=None, help='List file.')
@@ -48,23 +63,34 @@ if __name__ == '__main__':
         labels = dict((n, 'Class %d' % n) for n in np.unique(target))
     all_classes = sorted(labels.keys())
     classes = np.unique(target)
-    colors = np.array(colors)[np.in1d(all_classes, classes)]
-    for c, color in zip(classes, colors):
+    colors = get_synthetic_colors()
+    shapes = np.array(['o', 's', '>'])[np.in1d(all_classes, classes)].tolist()
+    colors = np.array(colors)[np.in1d(all_classes, classes)].tolist()
+    for c, shape, color in zip(classes, shapes, colors):
         mask = target == c
         if mask.any():
-            plt.scatter(data[mask][opts.x_feature], data[mask][opts.y_feature], c=color, edgecolors='none', alpha=0.4)
+            plt.scatter(data[mask][opts.x_feature], data[mask][opts.y_feature], c=color, marker=shape, edgecolors='none', alpha=0.4)
             plt.scatter(None, None, c=color, edgecolors='none', label=labels[c])
             plt.hold(True)
-    plt.xlabel(opts.x_feature)
-    plt.ylabel(opts.y_feature)
-    plt.legend()
-    plt.savefig(os.path.join(outdir, basename + '-%s-vs-%s.svg' % (opts.x_feature, opts.y_feature)))
+    if opts.x_label != None:
+        plt.xlabel(opts.x_label)
+    if opts.y_label != None:
+        plt.ylabel(opts.y_label)
+    plt.xticks([1,2,3], [1,2,3])
+    if opts.no_y_ticks:
+        plt.yticks([1,2,3], ['','',''])
+    else:
+        plt.yticks([1,2,3], [1,2,3])
+    if opts.legend:
+        plt.legend()
+    plt.savefig(os.path.join(outdir, basename + '-%s-vs-%s' % (opts.x_feature, opts.y_feature) + extension))
     plt.close()
 
     for f in [opts.x_feature, opts.y_feature]:
         plt.hist([data[target == c][f] for c in classes], histtype='barstacked', color=colors, label=[labels[c] for c in classes])
         plt.xlabel('Count')
         plt.ylabel('Classes')
-        plt.legend()
-        plt.savefig(os.path.join(outdir, basename + '-%s.svg' % f))
+        if opts.legend:
+            plt.legend()
+        plt.savefig(os.path.join(outdir, basename + '-%s' % f + extension))
         plt.close()
