@@ -1,0 +1,6 @@
+folds: 10
+hyper_params: [ unary_weight, smoothness_weight, regularization_weight ]
+scoring: accuracy
+unary_weight: [ 0.0625, 0.125, 0.25, 0.5, 1., 2., 4., 8., 16. ]
+smoothness_weight: [ 0.0625, 0.125, 0.25, 0.5, 1., 2., 4., 8., 16. ]
+regularization_weight: [ 0.015625, 0.03125, 0.0625, 0.125 ]
