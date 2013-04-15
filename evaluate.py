@@ -11,6 +11,11 @@ import scipy.interpolate as spi
 import sys
 from jinja2 import Environment, FileSystemLoader
 
+matplotlib.rcParams['svg.fonttype'] = 'none'
+matplotlib.rcParams['savefig.bbox'] = 'tight'
+matplotlib.rcParams['savefig.pad_inches'] = 0.01
+matplotlib.rcParams['figure.figsize'] = (3,3)
+
 import tsh; logger = tsh.create_logger(__name__)
 from utils import read_listfile, read_truthfile, select
 
@@ -108,34 +113,34 @@ def process(pred_filename, truth_filename, fprs=None, tprs=None, precisions=None
 
     truth_name = truth_meta['truth']
     labels = truth_meta[truth_name + '_labels']
-    roccurves = []
-    prcurves = []
-    for class_num, class_label in labels.items():
-        true = truth == class_num
-        prob = pred['prob%d' % class_num]
+    #roccurves = []
+    #prcurves = []
+    #for class_num, class_label in labels.items():
+        #true = truth == class_num
+        #prob = pred['prob%d' % class_num]
         #prob = pred['pred'] == class_num
         #prob = pred['pred_argmax'] == class_num
-        fpr, tpr = create_roc_curve(true, prob)
-        rocname = os.path.join(outdir, predname + '-roc-' + truth_name + '-%d' % class_num + '.svg')
-        plot_roc_curve(fpr, tpr,
-            title='ROC - ' + truth_name.capitalize() + ' ' + class_label,
-            filename=rocname)
-        roccurves += [rocname]
-        if fpr != None:
-            fprs[class_num] += [fpr]
-        if tpr != None:
-            tprs[class_num] += [tpr]
-        precision, recall = create_prc_curve(true, prob)
+        #fpr, tpr = create_roc_curve(true, prob)
+        #rocname = os.path.join(outdir, predname + '-roc-' + truth_name + '-%d' % class_num + '.svg')
+        #plot_roc_curve(fpr, tpr,
+        #    title='ROC - ' + truth_name.capitalize() + ' ' + class_label,
+        #    filename=rocname)
+        #roccurves += [rocname]
+        #if fpr != None:
+        #    fprs[class_num] += [fpr]
+        #if tpr != None:
+        #    tprs[class_num] += [tpr]
+        #precision, recall = create_prc_curve(true, prob)
         #print class_label, precision, recall
-        prcname = os.path.join(outdir, predname + '-prc-' + truth_name + '-%d' % class_num + '.svg')
-        plot_prc_curve(precision, recall,
-            title='Precision-Recall curve - ' + truth_name.capitalize() + ' ' + class_label,
-            filename=prcname)
-        prcurves += [prcname]
-        if precision != None:
-            precisions[class_num] += [precision]
-        if recall != None:
-            recalls[class_num] += [recall]
+        #prcname = os.path.join(outdir, predname + '-prc-' + truth_name + '-%d' % class_num + '.svg')
+        #plot_prc_curve(precision, recall,
+        #    title='Precision-Recall curve - ' + truth_name.capitalize() + ' ' + class_label,
+        #    filename=prcname)
+        #prcurves += [prcname]
+        #if precision != None:
+        #    precisions[class_num] += [precision]
+        #if recall != None:
+        #    recalls[class_num] += [recall]
 
     sorted_class_nums = sorted(labels.keys())
     sorted_class_labels = tsh.dict_values(labels, sorted_class_nums)
@@ -155,21 +160,21 @@ def process(pred_filename, truth_filename, fprs=None, tprs=None, precisions=None
             f.write('%s accuracy: %3f\n' % (labels[sorted_class_nums[i]], label_acc[i]))
         f.write('Sample accuracy: %.3f, label accuracy: %.3f\n' % (acc, label_avg_acc))
 
-    samples = []
-    truth_meta, truth = read_listfile(truth_filename)
-    if 'image_prefix' in truth_meta:
-        for t in truth:
-            samples += [{
-                'id': t['id'],
-                'image': os.path.join('image', os.path.relpath(os.path.join(truth_meta['image_prefix'], t['image']), '/home/imp/kazmar/vt_project/Segmentation/Fine/MetaSys/')),
-                'mask': os.path.join('image', os.path.relpath(os.path.join(truth_meta['mask_prefix'], t['mask']), '/home/imp/kazmar/vt_project/Segmentation/Fine/MetaSys/')),
-                'expr': os.path.join('expr', 'expr%d.png' % t['id']),
-                'truth': labels[t[truth_name]],
-                'prediction': labels[pred['pred'][truth['id'] == t['id']][0]] }]
-        template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-        env = Environment(loader=FileSystemLoader(template_dir))
-        open(os.path.join(outdir, predname + '.html'), 'w').write(env.get_template('evaluation.html').render(
-                title=predname + ' ' + truth_name, cm=cmname, roccurves=roccurves, prcurves=prcurves, samples=samples, predictions=all_pred, accuracy=acc, label_accuracy=zip(sorted_class_nums, label_acc), label_nums=sorted_class_nums, labels=labels))
+    #samples = []
+    #truth_meta, truth = read_listfile(truth_filename)
+    #if 'image_prefix' in truth_meta:
+    #    for t in truth:
+    #        samples += [{
+    #            'id': t['id'],
+    #            'image': os.path.join('image', os.path.relpath(os.path.join(truth_meta['image_prefix'], t['image']), '/home/imp/kazmar/vt_project/Segmentation/Fine/MetaSys/')),
+    #            'mask': os.path.join('image', os.path.relpath(os.path.join(truth_meta['mask_prefix'], t['mask']), '/home/imp/kazmar/vt_project/Segmentation/Fine/MetaSys/')),
+    #            'expr': os.path.join('expr', 'expr%d.png' % t['id']),
+    #            'truth': labels[t[truth_name]],
+    #            'prediction': labels[pred['pred'][truth['id'] == t['id']][0]] }]
+    #    template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+    #    env = Environment(loader=FileSystemLoader(template_dir))
+    #    open(os.path.join(outdir, predname + '.html'), 'w').write(env.get_template('evaluation.html').render(
+    #            title=predname + ' ' + truth_name, cm=cmname, roccurves=roccurves, prcurves=prcurves, samples=samples, predictions=all_pred, accuracy=acc, label_accuracy=zip(sorted_class_nums, label_acc), label_nums=sorted_class_nums, labels=labels))
 
     cms += [cm]
     accs += [acc]
@@ -219,58 +224,58 @@ if __name__ == '__main__':
     else:
         all_prefix = opts.all_prefix
 
-    roccurves = []
-    prcurves = []
-    for class_num, class_label in labels.items():
-        if len(all_fprs[class_num]) == 0:
-            tpr = None
-            fpr = None
-        else:
-            fpr, tpr = average_curves(all_fprs[class_num], all_tprs[class_num])
-        if len(all_recalls[class_num]) == 0:
-            recall = None
-            precision = None
-        else:
-            recall, precision = average_curves(map(lambda l: l[::-1], all_recalls[class_num]), map(lambda l: l[::-1], all_precisions[class_num]))
-            recall = recall[::-1]
-            precision = precision[::-1]
-        rocname = os.path.join(outdir, all_prefix + '-roc-' + truth_name + '-%d' % class_num + '.svg')
-        plot_roc_curve(fpr, tpr,
-            title='ROC - ' + truth_name.capitalize() + ' ' + class_label,
-            filename=rocname)
-        roccurves += [rocname]
-        prname = os.path.join(outdir, all_prefix + '-prc-' + truth_name + '-%d' % class_num + '.svg')
-        plot_prc_curve(precision, recall,
-            title='Precision-Recall curve - ' + truth_name.capitalize() + ' ' + class_label,
-            filename=prname)
-        prcurves += [prname]
+    #roccurves = []
+    #prcurves = []
+    #for class_num, class_label in labels.items():
+    #    if len(all_fprs[class_num]) == 0:
+    #        tpr = None
+    #        fpr = None
+    #    else:
+    #        fpr, tpr = average_curves(all_fprs[class_num], all_tprs[class_num])
+    #    if len(all_recalls[class_num]) == 0:
+    #        recall = None
+    #        precision = None
+    #    else:
+    #        recall, precision = average_curves(map(lambda l: l[::-1], all_recalls[class_num]), map(lambda l: l[::-1], all_precisions[class_num]))
+    #        recall = recall[::-1]
+    #        precision = precision[::-1]
+    #    rocname = os.path.join(outdir, all_prefix + '-roc-' + truth_name + '-%d' % class_num + '.svg')
+    #    plot_roc_curve(fpr, tpr,
+    #        title='ROC - ' + truth_name.capitalize() + ' ' + class_label,
+    #        filename=rocname)
+    #    roccurves += [rocname]
+    #    prname = os.path.join(outdir, all_prefix + '-prc-' + truth_name + '-%d' % class_num + '.svg')
+    #    plot_prc_curve(precision, recall,
+    #        title='Precision-Recall curve - ' + truth_name.capitalize() + ' ' + class_label,
+    #        filename=prname)
+    #    prcurves += [prname]
 
-    all_tprs = reduce(operator.concat, [all_tprs[class_num] for class_num in labels.keys() if len(all_tprs[class_num]) != 0])
-    all_fprs = reduce(operator.concat, [all_fprs[class_num] for class_num in labels.keys() if len(all_fprs[class_num]) != 0])
-    if len(all_fprs) == 0:
-        tpr = None
-        fpr = None
-    else:
-        fpr, tpr = average_curves(all_fprs, all_tprs)
-    rocname = os.path.join(outdir, all_prefix + '-roc-' + truth_name + '.svg')
-    plot_roc_curve(fpr, tpr,
-        title='ROC - ' + truth_name.capitalize(),
-        filename=rocname)
-    roccurves += [rocname]
-    all_recalls = reduce(operator.concat, [all_recalls[class_num] for class_num in labels.keys() if len(all_recalls[class_num]) != 0])
-    all_precisions = reduce(operator.concat, [all_precisions[class_num] for class_num in labels.keys() if len(all_precisions[class_num]) != 0])
-    if len(all_recalls) == 0:
-        recall = None
-        precision = None
-    else:
-        recall, precision = average_curves(map(lambda l: l[::-1], all_recalls), map(lambda l: l[::-1], all_precisions))
-        recall = recall[::-1]
-        precision = precision[::-1]
-    prname = os.path.join(outdir, all_prefix + '-prc-' + truth_name + '.svg')
-    plot_prc_curve(precision, recall,
-        title='Precision-Recall curve - ' + truth_name.capitalize(),
-        filename=prname)
-    prcurves += [prname]
+    #all_tprs = reduce(operator.concat, [all_tprs[class_num] for class_num in labels.keys() if len(all_tprs[class_num]) != 0])
+    #all_fprs = reduce(operator.concat, [all_fprs[class_num] for class_num in labels.keys() if len(all_fprs[class_num]) != 0])
+    #if len(all_fprs) == 0:
+    #    tpr = None
+    #    fpr = None
+    #else:
+    #    fpr, tpr = average_curves(all_fprs, all_tprs)
+    #rocname = os.path.join(outdir, all_prefix + '-roc-' + truth_name + '.svg')
+    #plot_roc_curve(fpr, tpr,
+    #    title='ROC - ' + truth_name.capitalize(),
+    #    filename=rocname)
+    #roccurves += [rocname]
+    #all_recalls = reduce(operator.concat, [all_recalls[class_num] for class_num in labels.keys() if len(all_recalls[class_num]) != 0])
+    #all_precisions = reduce(operator.concat, [all_precisions[class_num] for class_num in labels.keys() if len(all_precisions[class_num]) != 0])
+    #if len(all_recalls) == 0:
+    #    recall = None
+    #    precision = None
+    #else:
+    #    recall, precision = average_curves(map(lambda l: l[::-1], all_recalls), map(lambda l: l[::-1], all_precisions))
+    #    recall = recall[::-1]
+    #    precision = precision[::-1]
+    #prname = os.path.join(outdir, all_prefix + '-prc-' + truth_name + '.svg')
+    #plot_prc_curve(precision, recall,
+    #    title='Precision-Recall curve - ' + truth_name.capitalize(),
+    #    filename=prname)
+    #prcurves += [prname]
 
     cm = np.sum(all_cms, axis=0)
     set_acc = np.mean(all_accs)
@@ -289,8 +294,8 @@ if __name__ == '__main__':
     plt.savefig(cmname)
     plt.close()
 
-    template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-    env = Environment(loader=FileSystemLoader(template_dir))
-    open(os.path.join(outdir, all_prefix + '-evaluation.html'), 'w').write(env.get_template('evaluation.html').render(
-            title=all_prefix, cm=cmname, roccurves=roccurves, prcurves=prcurves, label_nums=sorted_class_nums, labels=labels, datasets=datasets, samples=None, predictions=None))
+    #template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+    #env = Environment(loader=FileSystemLoader(template_dir))
+    #open(os.path.join(outdir, all_prefix + '-evaluation.html'), 'w').write(env.get_template('evaluation.html').render(
+    #        title=all_prefix, cm=cmname, roccurves=roccurves, prcurves=prcurves, label_nums=sorted_class_nums, labels=labels, datasets=datasets, samples=None, predictions=None))
 

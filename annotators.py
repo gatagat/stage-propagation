@@ -56,7 +56,7 @@ if __name__ == '__main__':
     plt.close()
 
     print 'Annotated in both: %d' % n_both
-    print 'Sample accuracy: %.2f, label accuracy: %.2f' % (acc, label_avg_acc)
+    print 'Sample accuracy: %.3f, label accuracy: %.3f' % (acc, label_avg_acc)
     for i in range(len(sorted_class_nums)):
             print '%s accuracy: %3f' % (labels[sorted_class_nums[i]], label_acc[i])
 

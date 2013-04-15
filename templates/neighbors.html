@@ -21,7 +21,7 @@
             <td{% if s.truth != 'N/A' and s.prediction != s.truth %} class="error"{% endif %}>{{ s.prediction }}</td>
             <td{% if s.truth != 'N/A' and s.propagated != s.truth %} class="error"{% endif %}>{{ s.propagated }}</td>
             {% for n in s.neighbors %}
-            <td><img src="{{ n.expr }}" width="160px"><div>{{ n.id }} - {{ n.truth }}/{{ n.prediction }}/{{ n.propagated }} : {{ '%.2f' % n.dissim }}</td>
+            <td><img src="{{ n.expr }}" width="160px"><div>{{ n.id }} - {{ n.truth }}/{{ n.prediction }}/{{ n.propagated }} : {{ '%.5f' % n.dissim }}</td>
             {% endfor %}
         </tr>
         {% endfor %}

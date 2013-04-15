@@ -10,7 +10,7 @@ from jinja2 import Environment, FileSystemLoader
 import tsh; logger = tsh.create_logger(__name__)
 from utils import read_listfile, read_truthfile, read_weightsfile
 
-def get_samples_data(listname, dissimname, predname, propname, truthname, only_errors):
+def get_samples_data(listname, dissimname, predname, propname, truthname, only_errors, k=5):
     meta, data = read_listfile(listname)
     dissim_meta, dissim_ids, dissim = read_weightsfile(dissimname)
     assert (data['id'] == dissim_ids).all()
@@ -29,7 +29,8 @@ def get_samples_data(listname, dissimname, predname, propname, truthname, only_e
         labels = truth_meta[truth_name + '_labels']
 
     samples = []
-    for j in range(len(data)):
+    for id in truth_ids: #j in range(len(data)):
+        j = np.nonzero(data['id'] == id)[0][0]
         d = data[j]
         sample = {
             'id': d['id'], 
@@ -41,7 +42,7 @@ def get_samples_data(listname, dissimname, predname, propname, truthname, only_e
                 '/home/imp/kazmar/vt_project/Segmentation/Fine/MetaSys/')),
             'expr': os.path.join('expr', 'expr%d.png' % d['id']) }
 
-        neighbor_ids = heapq.nsmallest(5, range(len(data)), key=lambda ind: dissim[j, ind])
+        neighbor_ids = heapq.nsmallest(k, range(len(data)), key=lambda ind: dissim[j, ind])
         neighbors = []
         for n in neighbor_ids:
             neighbors += [{'id': data['id'][n],
@@ -86,6 +87,9 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
     opts = parser.parse_args()
     config = tsh.read_config(opts, __file__)
+
+    k = 10
+
     if opts.output == None:
         outdir = tempfile.mkdtemp(dir=os.curdir, prefix='out')
         logger.info('Output directory %s', outdir)
@@ -106,7 +110,7 @@ if __name__ == '__main__':
                 predname = opts.pred[n]
             if opts.prop != None:
                 propname = opts.prop[n]
-            samples += get_samples_data(opts.list[n], opts.dissim[n], predname, propname, truthname, opts.errors)
+            samples += get_samples_data(opts.list[n], opts.dissim[n], predname, propname, truthname, opts.errors, k=k)
 
         template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
         env = Environment(loader=FileSystemLoader(template_dir))
@@ -115,10 +119,10 @@ if __name__ == '__main__':
             inputname = os.path.basename(os.path.splitext(opts.list[0])[0])
             suffix = 'errors' if opts.errors else 'neighbors'
             open(os.path.join(outdir, inputname + '-' + suffix + '.html'), 'w').write(env.get_template('neighbors.html').render(
-                    title='Nearest neighbors for ' + inputname, k=5, samples=samples))
+                    title='Nearest neighbors for ' + inputname, k=k, samples=samples))
         else:
             inputname = 'all'
             suffix = 'errors' if opts.errors else 'neighbors'
             open(os.path.join(outdir, inputname + '-' + suffix + '.html'), 'w').write(env.get_template('neighbors.html').render(
-                    title='Nearest neighbors for ' + inputname, k=5, samples=samples))
+                    title='Nearest neighbors for ' + inputname, k=k, samples=samples))
 
