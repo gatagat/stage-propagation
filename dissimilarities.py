@@ -57,31 +57,33 @@ def prepare_weights_data(ids, id_dtype, w):
             dtype=zip(['id'] + cols, [id_dtype] + [np.float64] * len(cols)))
     return dissim
 
+
+def dissimilarities(methodname, listname, argsname=None, n_jobs=None, outdir=None):
+    if outdir == None:
+        outdir = tempfile.mkdtemp(dir=os.curdir, prefix='out')
+    else:
+        if not os.path.exists(outdir):
+            tsh.makedirs(outdir)
+    inputname = os.path.splitext(os.path.basename(listname))[0]
+    meta, data = read_listfile(listname)
+    args = meta
+    if argsname != None:
+        args.update(read_argsfile(argsname))
+    args, w = compute_dissimilarity(methodname, args, data, n_jobs=n_jobs, output_dir=outdir, input_name=inputname)
+    if 'threshold' in args and args['threshold'] != 'False':
+        args, w = threshold_dissimilarity(args['threshold'], args, w)
+    dissim = prepare_weights_data(data['id'], data.dtype['id'], w)
+    clean_args(args)
+    write_listfile(os.path.join(outdir, inputname + '-dissim.csv'), dissim, input_name=inputname, **args)
+
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Computes dissimilarity of the input data.')
-    parser.add_argument('-c', '--config', dest='config', required=False, action='store', default=None, help='Path to the config file')
     parser.add_argument('-m', '--method', dest='method', required=True, action='store', choices=method_table.keys(), default=None, help='Method name.')
     parser.add_argument('-a', '--args', dest='args', required=False, action='store', default=None, help='Arguments file.')
     parser.add_argument('-l', '--list', dest='list', required=True, action='store', default=None, help='List file.')
     parser.add_argument('-j', '--jobs', dest='jobs', required=False, action='store', default=None, type=int, help='Number of parallel processes.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
     opts = parser.parse_args()
-    if opts.output == None:
-        outdir = tempfile.mkdtemp(dir=os.curdir, prefix='out')
-    else:
-        outdir = opts.output
-        if not os.path.exists(outdir):
-            tsh.makedirs(outdir)
-    inputname = os.path.splitext(os.path.basename(opts.list))[0]
-    config = tsh.read_config(opts, __file__)
-    meta, data = read_listfile(opts.list)
-    args = meta
-    if opts.args != None:
-        args.update(read_argsfile(opts.args))
-    args, w = compute_dissimilarity(opts.method, args, data, n_jobs=opts.jobs, output_dir=outdir, input_name=inputname)
-    if 'threshold' in args and args['threshold'] != 'False':
-        args, w = threshold_dissimilarity(args['threshold'], args, w)
-    dissim = prepare_weights_data(data['id'], data.dtype['id'], w)
-    clean_args(args)
-    write_listfile(os.path.join(outdir, inputname + '-dissim.csv'), dissim, input_name=inputname, **args)
+    dissimilarities(opts.method, opts.list, opts.args, opts.jobs, opts.output)

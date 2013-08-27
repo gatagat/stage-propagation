@@ -19,37 +19,47 @@ def predict(model, classes, features, output_dir=None):
     pred_argmax = np.array(classes)[proba.argmax(axis=1)]
     n_classes = proba.shape[1]
     ret = np.core.records.fromarrays(
-            [features['id']] + [pred, pred_argmax] + [proba[:, n].flat for n in range(n_classes)],
-            names=['id', 'pred', 'pred_argmax'] + ['prob%d' % int(n) for n in classes])
+            [features['id']] + [pred, pred_argmax] + \
+                    [proba[:, n].flat for n in range(n_classes)],
+            names=['id', 'pred', 'pred_argmax'] + \
+                    ['prob%d' % int(n) for n in classes])
     return ret
+
+
+def classifier_predict(listname, modelname, outdir=None):
+    if outdir == None:
+        outdir = tempfile.mkdtemp(dir=os.curdir, prefix='out')
+    else:
+        if not os.path.exists(outdir):
+            tsh.makedirs(outdir)
+    inputname = os.path.splitext(os.path.basename(listname))[0]
+    meta, data = read_listfile(listname)
+    classifier = read_classifierfile(modelname)
+    feature_method = classifier['features']['meta']['feature_method']
+    feature_args = meta.copy()
+    # Training input_name would shadow the current one.
+    del classifier['features']['meta']['input_name']
+    feature_args.update(classifier['features']['meta'])
+    args, features = compute_features(feature_method, feature_args, data,
+            input_name=inputname, output_dir=outdir)
+    assert (data['id'] == features['id']).all()
+    clean_args(args)
+    write_listfile(os.path.join(outdir, inputname + '-feats.csv'), features,
+            input_name=inputname, **args)
+    labels_name = classifier['meta']['truth'] + '_labels'
+    labels = classifier['meta'][labels_name]
+    pred = predict(classifier['classifier'], sorted(labels.keys()), features,
+            output_dir=outdir)
+    write_listfile(os.path.join(outdir, inputname + '-predictions.csv'), pred,
+            classifier_name=modelname, truth=classifier['meta']['truth'],
+            labels_name=labels, input_name=inputname)
+
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Predicts classes.')
-    parser.add_argument('-c', '--config', dest='config', required=False, action='store', default=None, help='Path to the config file')
     parser.add_argument('-l', '--list', dest='list', required=True, action='store', default=None, help='List file.')
     parser.add_argument('-m', '--model', dest='model', required=True, action='store', default=None, help='Model file.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
     opts = parser.parse_args()
-    if opts.output == None:
-        outdir = tempfile.mkdtemp(dir=os.curdir, prefix='out')
-    else:
-        outdir = opts.output
-        if not os.path.exists(outdir):
-            tsh.makedirs(outdir)
-    inputname = os.path.splitext(os.path.basename(opts.list))[0]
-    config = tsh.read_config(opts, __file__)
-    meta, data = read_listfile(opts.list)
-    classifier = read_classifierfile(opts.model)
-    feature_method = classifier['features']['meta']['feature_method']
-    feature_args = meta.copy()
-    del classifier['features']['meta']['input_name'] # training input_name would shadow the current one
-    feature_args.update(classifier['features']['meta'])
-    args, features = compute_features(feature_method, feature_args, data, input_name=inputname, output_dir=outdir)
-    assert (data['id'] == features['id']).all()
-    clean_args(args)
-    write_listfile(os.path.join(outdir, inputname + '-feats.csv'), features, input_name=inputname, **args)
-    labels_name = classifier['meta']['truth'] + '_labels'
-    labels = classifier['meta'][labels_name]
-    pred = predict(classifier['classifier'], sorted(labels.keys()), features, output_dir=outdir)
-    write_listfile(os.path.join(outdir, inputname + '-predictions.csv'), pred, classifier_name=opts.model, truth=classifier['meta']['truth'], labels_name=labels, input_name=inputname)
+    classifier_predict(opts.list, opts.model, opts.output)
