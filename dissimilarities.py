@@ -74,7 +74,7 @@ def dissimilarities(methodname, listname, argsname=None, n_jobs=None, outdir=Non
         args, w = threshold_dissimilarity(args['threshold'], args, w)
     dissim = prepare_weights_data(data['id'], data.dtype['id'], w)
     clean_args(args)
-    write_listfile(os.path.join(outdir, inputname + '-dissim.csv'), dissim, input_name=inputname, **args)
+    write_listfile(os.path.join(outdir, inputname + '-dissim.csv.gz'), dissim, input_name=inputname, **args)
 
 
 if __name__ == '__main__':

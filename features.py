@@ -67,4 +67,4 @@ if __name__ == '__main__':
         args.update(read_argsfile(opts.args))
     args, features = compute_features(opts.method, args, data, input_name=inputname, output_dir=outdir)
     clean_args(args)
-    write_listfile(os.path.join(outdir, inputname + '-feats.csv'), features, input_name=inputname, **args)
+    write_listfile(os.path.join(outdir, inputname + '-feats.csv.gz'), features, input_name=inputname, **args)

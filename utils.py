@@ -1,3 +1,4 @@
+import gzip
 from matplotlib.pylab import csv2rec
 import numpy as np
 import yaml
@@ -57,7 +58,11 @@ def read_listfile(filename):
     data: recarray
         Data from the CSV table.
     """
-    with open(filename, 'r') as f:
+    if filename.endswith('.gz'):
+        open_fn = gzip.GzipFile
+    else:
+        open_fn = open
+    with open_fn(filename, 'r') as f:
         meta = [ line[1:] for line in f.readlines() if line.startswith('#') ]
     meta = yaml.load(''.join(meta))
     data = csv2rec(filename, delimiter='\t', comments='#')
@@ -84,7 +89,11 @@ def write_listfile(filename, data, **kwargs):
     kwargs: dict
         Meta data.
     """
-    with open(filename, 'w') as f:
+    if filename.endswith('.gz'):
+        open_fn = gzip.GzipFile
+    else:
+        open_fn = open
+    with open_fn(filename, 'w') as f:
         _dump_meta(f, kwargs)
         column_names = [n for n in data.dtype.names if n != 'id']
         f.write('\t'.join(['id'] + column_names) + '\n')

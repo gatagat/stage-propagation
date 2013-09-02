@@ -44,13 +44,13 @@ def classifier_predict(listname, modelname, outdir=None):
             input_name=inputname, output_dir=outdir)
     assert (data['id'] == features['id']).all()
     clean_args(args)
-    write_listfile(os.path.join(outdir, inputname + '-feats.csv'), features,
+    write_listfile(os.path.join(outdir, inputname + '-feats.csv.gz'), features,
             input_name=inputname, **args)
     labels_name = classifier['meta']['truth'] + '_labels'
     labels = classifier['meta'][labels_name]
     pred = predict(classifier['classifier'], sorted(labels.keys()), features,
             output_dir=outdir)
-    write_listfile(os.path.join(outdir, inputname + '-predictions.csv'), pred,
+    write_listfile(os.path.join(outdir, inputname + '-predictions.csv.gz'), pred,
             classifier_name=modelname, truth=classifier['meta']['truth'],
             labels_name=labels, input_name=inputname)
 

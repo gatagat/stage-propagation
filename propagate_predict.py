@@ -43,7 +43,7 @@ def propagate_predict(modelname, dissimname, predictionsname, outdir=None):
     args, prop = propagate(method_name, args, predictions, dissim, output_dir=outdir)
     clean_args(args)
     del args['cv_results']
-    write_listfile(os.path.join(outdir, inputname + '-propagated.csv'), prop, **args)
+    write_listfile(os.path.join(outdir, inputname + '-propagated.csv.gz'), prop, **args)
 
 
 if __name__ == '__main__':
