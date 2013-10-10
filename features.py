@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from joblib import Parallel, delayed
 import numpy as np
 import os
 import tempfile
@@ -23,7 +24,7 @@ method_table = {
         }
 
 
-def compute_features(method_name, method_args, data, input_name=None, output_dir=None):
+def compute_features(method_name, method_args, data, n_jobs=None, input_name=None, output_dir=None):
     cache = {}
     args = method_args.copy()
     additional_args = method_table[method_name]['prepare'](data, input_name=input_name, output_dir=output_dir, **args)
@@ -33,9 +34,16 @@ def compute_features(method_name, method_args, data, input_name=None, output_dir
     compute_fn = method_table[method_name]['function']
     N = len(data)
     d = len(feature_names)
-    _f = np.zeros((N, d), dtype=np.float64)
-    for i in range(N):
-        _f[i, :] = compute_fn(data[i], cache=cache, input_name=input_name, output_dir=output_dir, **args)
+    if n_jobs == None:
+        _f = np.zeros((N, d), dtype=np.float64)
+        for i in range(N):
+            _f[i, :] = compute_fn(data[i], cache=cache, input_name=input_name, output_dir=output_dir, **args)
+    else:
+        results = Parallel(n_jobs=n_jobs, verbose=True, pre_dispatch='2*n_jobs')(
+                delayed(compute_fn)(di, cache=cache, input_name=input_name, output_dir=output_dir, **args)
+                for di in [dict(zip(data.dtype.names, i)) for i in data])
+        _f = np.r_[results]
+
     features = np.core.records.fromarrays(
             [data['id']] + [_f[:, i] for i in range(_f.shape[1])],
             dtype=zip(['id'] + feature_names, [data.dtype['id']] + [np.float64] * d))
@@ -50,6 +58,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--method', dest='method', required=True, action='store', choices=method_table.keys(), default=None, help='Method name.')
     parser.add_argument('-a', '--args', dest='args', required=False, action='store', default=None, help='Method arguments file.')
     parser.add_argument('-l', '--list', dest='list', required=True, action='store', default=None, help='List file.')
+    parser.add_argument('-j', '--jobs', dest='jobs', required=False, action='store', default=None, type=int, help='Number of parallel processes.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
     opts = parser.parse_args()
     if opts.output == None:
@@ -60,11 +69,13 @@ if __name__ == '__main__':
         if not os.path.exists(outdir):
             tsh.makedirs(outdir)
     inputname = os.path.splitext(os.path.basename(opts.list))[0]
+    if opts.list.endswith('.gz'):
+        inputname = os.path.splitext(inputname)[0]
     config = tsh.read_config(opts, __file__)
     meta, data = read_listfile(opts.list)
     args = meta
     if opts.args != None:
         args.update(read_argsfile(opts.args))
-    args, features = compute_features(opts.method, args, data, input_name=inputname, output_dir=outdir)
+    args, features = compute_features(opts.method, args, data, input_name=inputname, n_jobs=opts.jobs, output_dir=outdir)
     clean_args(args)
     write_listfile(os.path.join(outdir, inputname + '-feats.csv.gz'), features, input_name=inputname, **args)

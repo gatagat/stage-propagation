@@ -1,9 +1,8 @@
 import cv2 as cv
+from joblib import Parallel, delayed
 import numpy as np
 import os
 from sklearn.metrics.pairwise import pairwise_distances
-
-from joblib import Parallel, delayed
 
 import tsh; logger = tsh.create_logger(__name__)
 
@@ -96,8 +95,10 @@ def extract_expression(image_file, mask_file, inside_file, expression_file,
     image = tsh.read_gray_image(image_file)
     mask = tsh.read_gray_image(mask_file)
     inside, expression = tsh.extract_embryo_gray(image, mask > 0, normalized_width, normalized_height)
-    cv.imwrite(inside_file, inside)
-    cv.imwrite(expression_file, 255*expression)
+    if inside_file is not None:
+        cv.imwrite(inside_file, inside)
+    if expression_file is not None:
+        cv.imwrite(expression_file, 255*expression)
     tsh.serialize(data_file, expression)
     return expression
 
@@ -139,6 +140,7 @@ def get_dissimilarities(data, output_dir=None, input_name=None, image_prefix=Non
         except:
             pass
 
+    save_expr_images = kwargs['save_expr_images'] if 'save_expr_images' in kwargs else False
     if os.path.exists(distance_name):
         D = tsh.deserialize(distance_name)['D']
     else:
@@ -151,8 +153,8 @@ def get_dissimilarities(data, output_dir=None, input_name=None, image_prefix=Non
             delayed(_extract_expression)(
                 imagenames[j],
                 masknames[j],
-                os.path.join(expr_dir, 'inside%02d.png' % data[j]['id']),
-                os.path.join(expr_dir, 'expr%02d.png' % data[j]['id']),
+                os.path.join(expr_dir, 'inside%02d.png' % data[j]['id']) if save_expr_images else None,
+                os.path.join(expr_dir, 'expr%02d.png' % data[j]['id']) if save_expr_images else None,
                 os.path.join(expr_dir, 'expr%02d.dat' % data[j]['id']),
                 normalized_width,
                 normalized_height

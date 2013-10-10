@@ -5,7 +5,7 @@
 include Makefile.local
 include Makefile.list
 
-BASE=~/projs/VT/experiments/e130117_iccv
+BASE=~/projs/propagation
 PLOT_SYNTHETIC=$(BASE)/plot_synthetic.py 
 FEATURES=$(BASE)/features.py
 CL_TRAIN=$(BASE)/classifier_train.py

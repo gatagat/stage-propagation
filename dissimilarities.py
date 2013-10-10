@@ -65,6 +65,8 @@ def dissimilarities(methodname, listname, argsname=None, n_jobs=None, outdir=Non
         if not os.path.exists(outdir):
             tsh.makedirs(outdir)
     inputname = os.path.splitext(os.path.basename(listname))[0]
+    if listname.endswith('.gz'):
+        inputname = os.path.splitext(inputname)[0]
     meta, data = read_listfile(listname)
     args = meta
     if argsname != None:

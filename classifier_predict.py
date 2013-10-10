@@ -26,13 +26,15 @@ def predict(model, classes, features, output_dir=None):
     return ret
 
 
-def classifier_predict(listname, modelname, outdir=None):
+def classifier_predict(listname, modelname, outdir=None, n_jobs=None):
     if outdir == None:
         outdir = tempfile.mkdtemp(dir=os.curdir, prefix='out')
     else:
         if not os.path.exists(outdir):
             tsh.makedirs(outdir)
     inputname = os.path.splitext(os.path.basename(listname))[0]
+    if listname.endswith('.gz'):
+        inputname = os.path.splitext(inputname)[0]
     meta, data = read_listfile(listname)
     classifier = read_classifierfile(modelname)
     feature_method = classifier['features']['meta']['feature_method']
@@ -41,7 +43,7 @@ def classifier_predict(listname, modelname, outdir=None):
     del classifier['features']['meta']['input_name']
     feature_args.update(classifier['features']['meta'])
     args, features = compute_features(feature_method, feature_args, data,
-            input_name=inputname, output_dir=outdir)
+            input_name=inputname, n_jobs=n_jobs, output_dir=outdir)
     assert (data['id'] == features['id']).all()
     clean_args(args)
     write_listfile(os.path.join(outdir, inputname + '-feats.csv.gz'), features,
@@ -59,7 +61,8 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Predicts classes.')
     parser.add_argument('-l', '--list', dest='list', required=True, action='store', default=None, help='List file.')
+    parser.add_argument('-j', '--jobs', dest='jobs', required=False, action='store', default=None, type=int, help='Number of parallel processes.')
     parser.add_argument('-m', '--model', dest='model', required=True, action='store', default=None, help='Model file.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
     opts = parser.parse_args()
-    classifier_predict(opts.list, opts.model, opts.output)
+    classifier_predict(opts.list, opts.model, outdir=opts.output, n_jobs=opts.jobs)

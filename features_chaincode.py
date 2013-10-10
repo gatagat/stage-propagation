@@ -7,6 +7,7 @@ import Pycluster as pcl
 import tsh; logger = tsh.create_logger(__name__)
 
 def get_chaincode_from_image(filename, scale):
+    #print 'Computing chaincode from %s at scale %d' % (filename, scale)
     assert scale >= 1
     mask = tsh.read_gray_image(filename)
     normal_size = (800/scale, 400/scale)

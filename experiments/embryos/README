@@ -1,0 +1,8 @@
+1. Create Makefile.local from the template Makefile.local.example
+2. Setup the BASE variable in Makefile to point to the source code
+3. Train the classifier by:
+	make cl-train
+3. Train the propagation by:
+	make pr-train
+4. Finally test the performance by:
+	make test

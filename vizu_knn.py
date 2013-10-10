@@ -117,6 +117,8 @@ if __name__ == '__main__':
 
         if len(opts.list) == 1:
             inputname = os.path.basename(os.path.splitext(opts.list[0])[0])
+            if opts.list.endswith('.gz'):
+                inputname = os.path.splitext(inputname)[0]
             suffix = 'errors' if opts.errors else 'neighbors'
             open(os.path.join(outdir, inputname + '-' + suffix + '.html'), 'w').write(env.get_template('neighbors.html').render(
                     title='Nearest neighbors for ' + inputname, k=k, samples=samples))

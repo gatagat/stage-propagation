@@ -32,6 +32,8 @@ if __name__ == '__main__':
         if not os.path.exists(outdir):
             tsh.makedirs(outdir)
     inputname = os.path.splitext(os.path.basename(opts.list))[0]
+    if opts.list.endswith('.gz'):
+        inputname = os.path.splitext(inputname)[0]
     config = tsh.read_config(opts, __file__)
     if opts.sub == None:
         sub = .1
