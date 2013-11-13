@@ -12,40 +12,40 @@ PLOT_WEIGHTS=$(BASE)plot_weights.py
 PR_TRAIN=$(BASE)propagate_train.py
 PLOT_CV=$(BASE)plot_propagator_cv_results.py
 PR_PREDICT=$(BASE)propagate_predict.py
-SUBSAMPLE=$(BASE)subsample.py -n20
+SUBSAMPLE=$(BASE)subsample.py -n200
 
-# SEEDS
-# train-classifier.csv.gz: 1448504125468647
-# train-propagator.csv.gz: 1448504125479129
-# test.csv.gz: 1448504125483280
+# Random seeds to produce the figure from the paper.
+SEED_CL_TRAIN=--random-seed=1448515783095693
+SEED_PR_TRAIN=--random-seed=1448515806569040
+SEED_TEST=--random-seed=1448515813638880
 
 all: eval-pred eval-prop
 
 clean:
-	rm -f train-classifier*.csv.gz train-propagator*.csv.gz test*.csv.gz 2>/dev/null
+	rm -f train-classifier*.csv.gz train-propagator*.csv.gz test*.csv.gz train-propagator-part.csv test-part.csv 2>/dev/null
 	rm -f classifier.dat propagator.dat 2>/dev/null
-	rm -fr train-classifier train-propagator test 2>/dev/null
+	rm -fr train-classifier train-propagator test train-propagator-part test-part 2>/dev/null
 
 eval-pred: train-propagator/train-propagator-predictions-cm.svg
 eval-prop: test/test-predictions-cm.svg test/test-propagated-cm.svg \
 	train-propagator/propagator-cv.svg train-propagator/train-propagator-propagated-cm.svg
 
 train-classifier.csv.gz: generate.args
-	$(GENERATE) -a generate.args $@
+	$(GENERATE) $(SEED_CL_TRAIN) -a generate.args $@
 	$(PLOT_SYNTHETIC) -x f00 -y f01 -t $@ -o train-classifier
 
 train-classifier-part.csv: train-classifier.csv.gz
 	$(SUBSAMPLE) -l $^ -o .
 
 train-propagator.csv.gz: generate.args
-	$(GENERATE) -a generate.args $@
+	$(GENERATE) $(SEED_PR_TRAIN) -a generate.args $@
 	$(PLOT_SYNTHETIC) -x f00 -y f01 -t $@ -o train-propagator
 
 train-propagator-part.csv: train-propagator.csv.gz
 	$(SUBSAMPLE) -l $^ -o .
 
 test.csv.gz: generate.args
-	$(GENERATE) -a generate.args $@
+	$(GENERATE) $(SEED_TEST) -a generate.args $@
 	$(PLOT_SYNTHETIC) -x f00 -y f01 -t $@ -o test
 
 test-part.csv.gz: test.csv.gz

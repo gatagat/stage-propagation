@@ -7,6 +7,7 @@ import time
 import sklearn
 import sklearn.cross_validation
 import sklearn.grid_search
+import sklearn.metrics
 from joblib import Parallel, delayed
 
 import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
