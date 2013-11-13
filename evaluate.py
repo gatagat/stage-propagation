@@ -105,6 +105,8 @@ def average_curves(x, y, n=1000):
 
 def process(pred_filename, truth_filename, fprs=None, tprs=None, precisions=None, recalls=None, cms=None, accs=None, label_accs=None):
     predname = os.path.splitext(os.path.basename(pred_filename))[0]
+    if pred_filename.endswith('.gz'):
+        predname = os.path.splitext(predname)[0]
     truth_meta, truth_ids, truth = read_truthfile(truth_filename)
     pred_meta, all_pred = read_listfile(pred_filename)
     pred = select(all_pred, 'id', truth_ids)

@@ -50,13 +50,20 @@ if __name__ == '__main__':
         meta, data = read_listfile(opts.truth)
         target = data['class']
         basename = os.path.splitext(os.path.basename(opts.truth))[0]
+        if opts.truth.endswith('.gz'):
+            basename = os.path.splitext(basename)[0]
     else:
         meta, data = read_listfile(opts.list)
         pred_meta, pred = read_listfile(opts.pred)
-        assert pred_meta['input_name'] == os.path.splitext(os.path.basename(opts.list))[0]
+        #inputname = os.path.splitext(os.path.basename(opts.list))[0]
+        #if opts.list.endswith('.gz'):
+        #    inputname = os.path.splitext(inputname)[0]
+        #assert pred_meta['input_name'] == inputname
         assert (pred['id'] == data['id']).all()
         target = pred['pred']
         basename = os.path.splitext(os.path.basename(opts.pred))[0]
+        if opts.pred.endswith('.gz'):
+            basename = os.path.splitext(basename)[0]
     try:
         labels = meta[meta['truth'] + '_labels']
     except:

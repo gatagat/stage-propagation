@@ -7,7 +7,8 @@ import tempfile
 
 import tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, read_listfile, write_listfile, clean_args
-from features_chaincode import get_chaincode_features, prepare_chaincode_features
+
+method_table = {}
 
 def get_pregenerated_features(sample, feature_names=None, **kwargs):
     assert feature_names is not None
@@ -18,15 +19,28 @@ def prepare_pregenerated_features(data, features=None, **kwargs):
     return {}
 
 
-method_table = {
-        'pregenerated': { 'function': get_pregenerated_features, 'prepare': prepare_pregenerated_features },
-        'chaincode': { 'function': get_chaincode_features, 'prepare': prepare_chaincode_features }
-        }
+method_table['pregenerated'] = {
+    'function': get_pregenerated_features,
+    'prepare': prepare_pregenerated_features
+}
+
+try:
+    from features_chaincode import get_chaincode_features,\
+        prepare_chaincode_features
+    method_table['chaincode'] = {
+        'function': get_chaincode_features,
+        'prepare': prepare_chaincode_features
+    }
+except ImportError:
+    logger.exception('Missing packages - chaincode features will not be available')
+    pass
 
 
 def compute_features(method_name, method_args, data, n_jobs=None, input_name=None, output_dir=None):
     cache = {}
     args = method_args.copy()
+    if method_name not in method_table:
+        raise NotImplementedError
     additional_args = method_table[method_name]['prepare'](data, input_name=input_name, output_dir=output_dir, **args)
     args.update(additional_args)
     feature_names = args['feature_names']

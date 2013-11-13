@@ -30,6 +30,9 @@ if __name__ == '__main__':
             tsh.makedirs(outdir)
     config = tsh.read_config(opts, __file__)
     meta, ids, weights = read_weightsfile(opts.weights)
+    basename = os.path.splitext(os.path.basename(opts.weights))[0]
+    if opts.weights.endswith('.gz'):
+        basename = os.path.splitext(basename)[0]
 
     if opts.colormap != None and opts.colormap == 'stages':
         cm = 'stages'
@@ -60,7 +63,7 @@ if __name__ == '__main__':
             target2 = target2.T
             ax_target_y.imshow(target2, vmin=0, vmax=255, cmap=cm)
             ax_target_y.set_axis_off()
-        plt.savefig(os.path.join(outdir, os.path.splitext(os.path.basename(opts.weights))[0] + '-sorted.svg'))
+        plt.savefig(os.path.join(outdir, basename + '-sorted.svg'))
         plt.close()
 
     if opts.truth != None:
@@ -75,11 +78,11 @@ if __name__ == '__main__':
         target2 = target2.T
         ax_target_y.imshow(target2, vmin=0, vmax=255, cmap=cm, interpolation='nearest')
         ax_target_y.set_axis_off()
-        plt.savefig(os.path.join(outdir, os.path.splitext(os.path.basename(opts.weights))[0] + '-truth.svg'))
+        plt.savefig(os.path.join(outdir, basename + '-truth.svg'))
         plt.close()
 
     plt.imshow(lweights)
     plt.colorbar()
-    plt.savefig(os.path.join(outdir, os.path.splitext(os.path.basename(opts.weights))[0] + '.svg'))
+    plt.savefig(os.path.join(outdir, basename + '.svg'))
     plt.close()
 

@@ -50,11 +50,12 @@ if __name__ == '__main__':
     opts = parser.parse_args()
     config = tsh.read_config(opts, __file__)
     if opts.seed == -1:
-        seed = int(time.time()*1024*1024)
+        seed = int(time.time()*1024*1024+time.time())
     else:
         seed = opts.seed
     np.random.seed(seed)
     args = read_argsfile(opts.args)
     args, data = generate(**args)
+    args['random_seed'] = seed
     clean_args(args)
     write_listfile(opts.output, data, **args)

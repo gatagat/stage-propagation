@@ -2,7 +2,6 @@ from collections import Counter
 import numpy as np
 import os
 from PIL import Image
-import Pycluster as pcl
 
 import tsh; logger = tsh.create_logger(__name__)
 
@@ -76,6 +75,7 @@ def get_chaincode_features(sample, dictionary=None, cache=None, bow_options=None
 
 
 def cluster(D, k):
+    import Pycluster as pcl
     labels, _, _ = pcl.kmedoids(D, nclusters=k, npass=10, initialid=None)
     errors = np.array([ D[labels[i], i] for i in range(len(labels)) ])
     centroidids = np.unique(labels)
