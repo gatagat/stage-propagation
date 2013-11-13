@@ -3,7 +3,7 @@ from matplotlib.pylab import csv2rec
 import numpy as np
 import yaml
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 
 
 def _dump_meta(filespec, meta):

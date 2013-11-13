@@ -5,7 +5,7 @@ import numpy as np
 import tempfile
 import os
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_listfile, read_argsfile, clean_args, write_listfile
 from dissimilarities_expression import get_dissimilarities as get_dissimilarities_expression
 

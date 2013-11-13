@@ -8,7 +8,7 @@ import os
 import scipy.cluster.hierarchy as hier
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_weightsfile, read_truthfile
 import colormaps
 

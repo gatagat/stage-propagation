@@ -3,7 +3,7 @@
 import numpy as np
 import time
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, write_listfile, clean_args
 
 def generate(N=None, priors=None, means=None, sigmas=None, feature_dims=None, weight_dims=None, noise_dims=None, **kwargs):

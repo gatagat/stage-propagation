@@ -7,7 +7,7 @@ from matplotlib.pylab import csv2rec
 import tempfile
 import time
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import write_listfile
 
 if __name__ == '__main__':

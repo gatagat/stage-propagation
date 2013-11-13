@@ -4,7 +4,7 @@ import os
 import tempfile
 import shutil
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_listfile
 
 if __name__ == '__main__':

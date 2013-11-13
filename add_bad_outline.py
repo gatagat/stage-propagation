@@ -3,7 +3,7 @@
 from matplotlib.pylab import csv2rec, rec2csv
 import os
 
-import tsh
+import tsh.obsolete as tsh
 
 def is_blurred(fine_segmentation, dirname, ids):
     data = tsh.deserialize(os.path.join(fine_segmentation, dirname, 'blur-evaluation.dat'))

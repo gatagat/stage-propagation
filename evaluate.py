@@ -16,7 +16,7 @@ matplotlib.rcParams['savefig.bbox'] = 'tight'
 matplotlib.rcParams['savefig.pad_inches'] = 0.01
 matplotlib.rcParams['figure.figsize'] = (3,3)
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_listfile, read_truthfile, select
 
 def create_roc_curve(true, prob):

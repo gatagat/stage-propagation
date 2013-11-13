@@ -9,7 +9,7 @@ import sklearn.cross_validation
 import sklearn.grid_search
 from joblib import Parallel, delayed
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, read_listfile, read_truthfile, read_weightsfile, write_propagatorfile, clean_args, select
 from semisupervised import propagate_labels
 

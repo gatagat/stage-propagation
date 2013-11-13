@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sklearn.metrics
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_listfile
 
 if __name__ == '__main__':

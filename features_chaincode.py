@@ -3,7 +3,7 @@ import numpy as np
 import os
 from PIL import Image
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 
 def get_chaincode_from_image(filename, scale):
     #print 'Computing chaincode from %s at scale %d' % (filename, scale)

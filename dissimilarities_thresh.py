@@ -5,7 +5,7 @@ import numpy as np
 import tempfile
 import os
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_weightsfile, read_argsfile, clean_args, write_listfile
 
 def threshold_nearest(w, k=5, symmetric=True, **kwargs):

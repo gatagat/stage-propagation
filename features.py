@@ -5,7 +5,7 @@ import numpy as np
 import os
 import tempfile
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, read_listfile, write_listfile, clean_args
 
 method_table = {}

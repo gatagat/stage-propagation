@@ -7,7 +7,7 @@ import os
 import tempfile
 from jinja2 import Environment, FileSystemLoader
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_listfile, read_truthfile, read_weightsfile
 
 def get_samples_data(listname, dissimname, predname, propname, truthname, only_errors, k=5):

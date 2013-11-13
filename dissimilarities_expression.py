@@ -4,7 +4,7 @@ import numpy as np
 import os
 from sklearn.metrics.pairwise import pairwise_distances
 
-import tsh; logger = tsh.create_logger(__name__)
+import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 
 all_measures = [ 'SSD', 'NCCone', 'NSSD', 'Jaccard', 'cosine' ]
 normalized_dists = [ 'NSSD', 'NCCone', 'NCClog', 'NCCplus', 'NCCplusok' ]
