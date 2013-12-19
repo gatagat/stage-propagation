@@ -5,23 +5,23 @@
 include Makefile.local
 include Makefile.list
 
-BASE=~/projs/propagation
-PLOT_SYNTHETIC=$(BASE)/plot_synthetic.py 
-FEATURES=$(BASE)/features.py
-CL_TRAIN=$(BASE)/classifier_train.py
-CL_PREDICT=$(BASE)/classifier_predict.py
-EVALUATE=$(BASE)/evaluate.py
-DISSIM=$(BASE)/dissimilarities.py --jobs=$(N_JOBS)
-PLOT_WEIGHTS=$(BASE)/plot_weights.py
-PR_TRAIN=$(BASE)/propagate_train.py --jobs=$(N_JOBS)
-PLOT_CV=$(BASE)/plot_propagator_cv_results.py
-PR_PREDICT=$(BASE)/propagate_predict.py
-SUBSAMPLE=$(BASE)/subsample.py -n20
-CONVERT_TRUTH=$(BASE)/convert.py --truth=stage --no-timestamp 
-CONVERT=$(BASE)/convert.py --no-timestamp 
-LOCAL_COPY=$(BASE)/copy_images.py
-PLOT_WEIGHTS=$(BASE)/plot_weights.py
-VIZU_KNN=$(BASE)/vizu_knn.py
+SRC_BASE=../../
+PLOT_SYNTHETIC=$(SRC_BASE)plot_synthetic.py
+FEATURES=$(SRC_BASE)features.py
+CL_TRAIN=$(SRC_BASE)classifier_train.py --jobs=$(N_JOBS)
+CL_PREDICT=$(SRC_BASE)classifier_predict.py
+EVALUATE=$(SRC_BASE)evaluate.py
+DISSIM=$(SRC_BASE)dissimilarities.py --jobs=$(N_JOBS)
+PLOT_WEIGHTS=$(SRC_BASE)plot_weights.py
+PR_TRAIN=$(SRC_BASE)propagate_train.py --jobs=$(N_JOBS)
+PLOT_CV=$(SRC_BASE)plot_propagator_cv_results.py
+PR_PREDICT=$(SRC_BASE)propagate_predict.py
+SUBSAMPLE=$(SRC_BASE)subsample.py -n20
+CONVERT_TRUTH=$(SRC_BASE)convert.py --truth=stage --no-timestamp
+CONVERT=$(SRC_BASE)convert.py --no-timestamp
+LOCAL_COPY=$(SRC_BASE)copy_images.py
+PLOT_WEIGHTS=$(SRC_BASE)plot_weights.py
+VIZU_KNN=$(SRC_BASE)vizu_knn.py
 
 PR_TRAIN_DATAS:=$(PR_TRAIN_DATA:%=%-data.csv)
 PR_TRAIN_DISSIMS:=$(PR_TRAIN_DATA:%=%-data-dissim.csv.gz)
@@ -40,26 +40,27 @@ pr-train: propagator.dat
 test: predictions-test-cm.svg propagated-test-cm.svg
 truths: $(PR_TRAIN_TRUTHS)
 feats: $(PR_TRAIN_DATA:%=%-truth-feats.csv.gz) $(PR_TRAIN_DATA:%=%-data-feats.csv.gz)
-predictions: $(PR_TRAIN_PREDS)
-propagated: $(PR_TRAIN_PROPS)
+predictions: $(PR_TRAIN_PREDS) $(PR_TEST_PREDS)
+propagated: $(PR_TRAIN_PROPS) $(PR_TEST_PROPS)
 data: $(PR_TRAIN_DATAS)
 weights: $(PR_TRAIN_DATA:%=%-data-dissim.csv.gz)
 plot-weights: $(PR_TRAIN_DATA:%=%-data-dissim.svg)
 errors: $(PR_TRAIN_DATA:%=%-data-errors.html)
 
 clean:
-	rm -f classifier.dat propagator.dat 2>/dev/null
-	rm -f lp.dat chaincodes.dat dictionary.dat 2>/dev/null
+	rm -f classifier.dat *-lp.dat *-chaincodes.dat dictionary.dat 2>/dev/null
+	rm -f propagator.dat 2>/dev/null
 	rm -f *.svg 2>/dev/null
 	rm -f *.html *.txt 2>/dev/null
-	rm -f *-predictions.csv.gz *-propagated.csv.gz *-feats.csv.gz *-truth.csv *-data.csv *-dissim.csv.gz *-distances.dat 2>/dev/null
+	rm -f *-predictions.csv.gz *-propagated.csv.gz 2>/dev/null
+        rm -f *-feats.csv.gz *-truth.csv *-data.csv *-dissim.csv.gz *-distances.dat 2>/dev/null
 
 local-images: $(PR_ALL_DATA:%=%-data.csv)
 	$(LOCAL_COPY) -r ~/vt_project/Segmentation/Fine/MetaSys/ -o ../images/ $^
 	ln -s ../images/ image
 
 SpecificStages-truth.csv: truth/SpecificStages*.csv
-	$(CONVERT_TRUTH) --no-timestamp -p $(IMAGE_PREFIX) -o . 'truth/SpecificStages*.csv'
+	$(CONVERT_TRUTH) -p $(IMAGE_PREFIX) -o . 'truth/SpecificStages*.csv'
 	mv truth.csv $@
 
 Sampled-ek_%-truth.csv: truth/Sampled-ek_%.csv

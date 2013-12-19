@@ -41,13 +41,16 @@ def classifier_predict(listname, modelname, outdir=None, n_jobs=None):
     feature_args = meta.copy()
     # Training input_name would shadow the current one.
     del classifier['features']['meta']['input_name']
-    feature_args.update(classifier['features']['meta'])
-    args, features = compute_features(feature_method, feature_args, data,
-            input_name=inputname, n_jobs=n_jobs, output_dir=outdir)
-    assert (data['id'] == features['id']).all()
-    clean_args(args)
-    write_listfile(os.path.join(outdir, inputname + '-feats.csv.gz'), features,
-            input_name=inputname, **args)
+    featurename = os.path.join(outdir, inputname + '-feats.csv.gz')
+    if os.path.exists(featurename):
+        _, features = read_listfile(featurename)
+    else:
+        feature_args.update(classifier['features']['meta'])
+        args, features = compute_features(feature_method, feature_args, data,
+                input_name=inputname, n_jobs=n_jobs, output_dir=outdir)
+        assert (data['id'] == features['id']).all()
+        clean_args(args)
+        write_listfile(featurename, features, input_name=inputname, **args)
     labels_name = classifier['meta']['truth'] + '_labels'
     labels = classifier['meta'][labels_name]
     pred = predict(classifier['classifier'], sorted(labels.keys()), features,

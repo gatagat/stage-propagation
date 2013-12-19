@@ -1,0 +1,72 @@
+.PHONY: all clean cl-train pr-train test predictions propagated
+
+.SECONDARY: 
+
+include Makefile.local
+include Makefile.list
+
+SRC_BASE=/tmp/iccv/propagation/src/
+CL_TRAIN=$(SRC_BASE)classifier_train.py --jobs=$(N_JOBS)
+CL_PREDICT=$(SRC_BASE)classifier_predict.py
+EVALUATE=$(SRC_BASE)evaluate.py
+PR_TRAIN=$(SRC_BASE)propagate_train.py --jobs=$(N_JOBS)
+PLOT_CV=$(SRC_BASE)plot_propagator_cv_results.py
+PR_PREDICT=$(SRC_BASE)propagate_predict.py
+
+PR_TRAIN_DATAS:=$(PR_TRAIN_DATA:%=%-data.csv)
+PR_TRAIN_DISSIMS:=$(PR_TRAIN_DATA:%=%-data-dissim.csv.gz)
+PR_TRAIN_TRUTHS:=$(PR_TRAIN_DATA:%=%-truth.csv)
+PR_TRAIN_PREDS:=$(PR_TRAIN_DATA:%=%-data-predictions.csv.gz)
+PR_TRAIN_PROPS:=$(PR_TRAIN_DATA:%=%-data-propagated.csv.gz)
+
+PR_TEST_TRUTHS:=$(PR_TEST_DATA:%=%-truth.csv)
+PR_TEST_PREDS:=$(PR_TEST_DATA:%=%-data-predictions.csv.gz)
+PR_TEST_PROPS:=$(PR_TEST_DATA:%=%-data-propagated.csv.gz)
+
+all: cl-train pr-train test
+
+cl-train: classifier.dat
+pr-train: propagator.dat
+test: predictions-test-cm.svg propagated-test-cm.svg
+predictions: $(PR_TRAIN_PREDS) $(PR_TEST_PREDS)
+propagated: $(PR_TRAIN_PROPS) $(PR_TEST_PROPS)
+
+clean:
+	rm -f classifier.dat *-lp.dat *-chaincodes.dat dictionary.dat 2>/dev/null
+	rm -f propagator.dat 2>/dev/null
+	rm -f *.svg 2>/dev/null
+	rm -f *.html *.txt 2>/dev/null
+	rm -f *-predictions.csv.gz *-propagated.csv.gz 2>/dev/null
+
+classifier.dat: $(CL_TRAIN_DATA)-truth.csv $(CL_TRAIN_DATA)-truth-feats.csv.gz svm.args
+	$(CL_TRAIN) -m svm -a svm.args -f $(CL_TRAIN_DATA)-truth-feats.csv.gz -t $(CL_TRAIN_DATA)-truth.csv -o .
+
+%-predictions.csv.gz: %.csv classifier.dat
+	$(CL_PREDICT) -l $< -m classifier.dat -o .
+
+predictions-cm.svg: $(PR_TRAIN_PREDS) $(PR_TRAIN_TRUTHS)
+	$(EVALUATE) --all-prefix=predictions -p $(PR_TRAIN_PREDS) -t $(PR_TRAIN_TRUTHS) -o .
+
+predictions-test-cm.svg: $(PR_TEST_PREDS) $(PR_TEST_TRUTHS)
+	$(EVALUATE) --all-prefix=predictions-test -p $(PR_TEST_PREDS) -t $(PR_TEST_TRUTHS) -o .
+
+%-data-predictions-cm.svg: %-data-predictions.csv.gz %-truth.csv
+	$(EVALUATE) -p $*-data-predictions.csv.gz -t $*-truth.csv -o .
+
+propagator.dat: $(PR_TRAIN_DISSIMS) $(PR_TRAIN_TRUTHS) $(PR_TRAIN_PREDS) harmonic.args
+	$(PR_TRAIN) -m harmonic -a harmonic.args -t $(PR_TRAIN_TRUTHS) -d $(PR_TRAIN_DISSIMS) -p $(PR_TRAIN_PREDS) -o .
+
+propagator-cv.svg: propagator.dat
+	$(PLOT_CV) -m propagator.dat -o .
+
+%-propagated.csv.gz: %-dissim.csv.gz %-predictions.csv.gz propagator.dat
+	$(PR_PREDICT) -m propagator.dat -d $*-dissim.csv.gz -p $*-predictions.csv.gz -o .
+
+propagated-cm.svg: $(PR_TRAIN_PROPS) $(PR_TRAIN_TRUTHS)
+	$(EVALUATE) --all-prefix=propagated -p $(PR_TRAIN_PROPS) -t $(PR_TRAIN_TRUTHS) -o .
+
+propagated-test-cm.svg: $(PR_TEST_PROPS) $(PR_TEST_TRUTHS)
+	$(EVALUATE) --all-prefix=propagated-test -p $(PR_TEST_PROPS) -t $(PR_TEST_TRUTHS) -o .
+
+%-data-propagated-cm.svg: %-data-propagated.csv.gz %-truth.csv
+	$(EVALUATE) -p $*-data-propagated.csv.gz -t $*-truth.csv -o .

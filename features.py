@@ -85,11 +85,15 @@ if __name__ == '__main__':
     inputname = os.path.splitext(os.path.basename(opts.list))[0]
     if opts.list.endswith('.gz'):
         inputname = os.path.splitext(inputname)[0]
-    config = tsh.read_config(opts, __file__)
-    meta, data = read_listfile(opts.list)
-    args = meta
-    if opts.args != None:
-        args.update(read_argsfile(opts.args))
-    args, features = compute_features(opts.method, args, data, input_name=inputname, n_jobs=opts.jobs, output_dir=outdir)
-    clean_args(args)
-    write_listfile(os.path.join(outdir, inputname + '-feats.csv.gz'), features, input_name=inputname, **args)
+    outputname = os.path.join(outdir, inputname + '-feats.csv.gz')
+    if os.path.exists(outputname):
+        logger.info('Skipping file %s, already exists.', outputname)
+    else:
+        config = tsh.read_config(opts, __file__)
+        meta, data = read_listfile(opts.list)
+        args = meta
+        if opts.args != None:
+            args.update(read_argsfile(opts.args))
+        args, features = compute_features(opts.method, args, data, input_name=inputname, n_jobs=opts.jobs, output_dir=outdir)
+        clean_args(args)
+        write_listfile(outputname, features, input_name=inputname, **args)

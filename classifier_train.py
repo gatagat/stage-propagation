@@ -15,12 +15,14 @@ import tsh.obsolete as tsh; logger = tsh.create_logger(__name__)
 from utils import read_argsfile, read_truthfile, read_featurefile, write_classifierfile
 
 
-def train_svm(ids, features, target, labels, balance=None, coarse_C=None, scoring=None, folds=None, output_dir=None, **kwargs):
+def train_svm(ids, features, target, labels, n_jobs=None, balance=None, coarse_C=None, scoring=None, folds=None, output_dir=None, **kwargs):
     assert coarse_C != None
     assert balance != None
     assert scoring != None
     assert folds != None
 
+    if n_jobs == None:
+        n_jobs = 1
     logger.info(Counter(target))
     if balance == False:
         indices = np.arange(len(target))
@@ -38,7 +40,7 @@ def train_svm(ids, features, target, labels, balance=None, coarse_C=None, scorin
     grid = sklearn.grid_search.GridSearchCV(
             #sklearn.svm.LinearSVC(class_weight=class_weight),
             sklearn.svm.SVC(class_weight=class_weight, kernel='linear', probability=False, verbose=False, max_iter=10000000),
-            n_jobs=4,
+            n_jobs=n_jobs,
             param_grid=dict(C=coarse_C),
             scoring=scoring,
             cv=sklearn.cross_validation.StratifiedKFold(y=target, n_folds=folds),
@@ -73,14 +75,14 @@ method_table = {
         }
 
 
-def train_classifier(method_name, method_args, ids, features, target, output_dir=None):
+def train_classifier(method_name, method_args, ids, features, target, output_dir=None, n_jobs=None):
     args = method_args.copy()
     labels = None
     truth_name = args['truth']
     label_name = truth_name + '_labels'
     labels = args[label_name]
     logger.info(dict(zip(labels.keys(), [ (np.array(target) == s).sum() for s in labels.keys() ])))
-    return method_table[method_name]['function'](ids, features, target, labels, output_dir=output_dir, **args)
+    return method_table[method_name]['function'](ids, features, target, labels, output_dir=output_dir, n_jobs=n_jobs, **args)
 
 
 if __name__ == '__main__':
@@ -91,6 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--method', dest='method', required=True, action='store', choices=method_table.keys(), default=None, help='Method name.')
     parser.add_argument('-a', '--args', dest='args', required=False, action='store', default=None, help='Method arguments file.')
     parser.add_argument('-t', '--truth', dest='truth', required=True, action='store', default=None, help='Truth file.')
+    parser.add_argument('-j', '--jobs', dest='jobs', required=False, action='store', default=None, type=int, help='Number of parallel processes.')
     parser.add_argument('--random-seed', dest='seed', required=False, action='store', type=int, default=-1, help='Random seed, by default use time.')
     parser.add_argument('-o', '--output', dest='output', required=False, action='store', default=None, help='Output directory.')
     opts = parser.parse_args(sys.argv[1:])
@@ -112,7 +115,7 @@ if __name__ == '__main__':
     else:
         seed = opts.seed
     np.random.seed(seed)
-    args, classifier = train_classifier(opts.method, args, truth_ids, features, target, output_dir=outdir)
+    args, classifier = train_classifier(opts.method, args, truth_ids, features, target, output_dir=outdir, n_jobs=opts.jobs)
     args['random_generator_seed'] = seed
     data = {
             'classifier': classifier,

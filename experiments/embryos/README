@@ -1,8 +1,39 @@
-1. Create Makefile.local from the template Makefile.local.example
-2. Setup the BASE variable in Makefile to point to the source code
-3. Train the classifier by:
-	make cl-train
-3. Train the propagation by:
-	make pr-train
-4. Finally test the performance by:
-	make test
+Embryo staging experiment
+=========================
+
+This is the embryo staging experiment from the paper:
+  Kazmar T, Kvon EZ, Stark A, Lampert CH. Drosophila Embryo Stage
+  Annotation using Label Propagation. International Conference on
+  Computer Vision (ICCV), 2013.
+
+The features: embryo shape (*-feats.csv.gz) and pattern similarity
+(*-dissim.csv.gz) are precomputed to avoid distribution of the original image
+data (>50GB). However, we are happy to share the data it with interested
+people.  If you are interested, please, contact us: tomas.kazmar@imp.ac.at
+
+For data file description, refer to README coming with the source code.
+
+Replicating the results:
+  1. Create Makefile.local from the template Makefile.local.example
+  2. Setup the SRC_BASE variable in Makefile to point to the source code
+  3. Train the classifier by:
+    make cl-train
+  3. Train the propagation by:
+    make pr-train
+  4. Finally test the performance by:
+    make test
+  5. Check reported accuracies by:
+    cat pr*.txt
+
+  To use multiple cores setup the N_JOBS variable in Makefile.local and also run
+  the commands above as:
+
+  make -j your_number_of_cores cl-train
+  make -j your_number_of_cores pr-train
+  make -j your_number_of_cores test
+
+  If everything worked as expected, you should receive results comparable to the
+  paper, ie., something like:
+
+  Sample accuracy: 0.706, label accuracy: 0.672, set accuracy: 0.718
+  Sample accuracy: 0.825, label accuracy: 0.680, set accuracy: 0.812

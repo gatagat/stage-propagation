@@ -1,0 +1,7 @@
+1. Setup the SRC_BASE variable in Makefile to point to the source code
+2. Run
+	make
+
+The synthetic data is fixed to the dataset used for the figure in the paper.
+Change the random seeds in the Makefile to get random data.
+

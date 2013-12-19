@@ -1,18 +1,18 @@
 .PHONY: eval-prop eval-pred
 
-BASE=~/projs/propagation/
-GENERATE=$(BASE)generate.py
-PLOT_SYNTHETIC=$(BASE)plot_synthetic.py
-FEATURES=$(BASE)features.py
-CL_TRAIN=$(BASE)classifier_train.py
-CL_PREDICT=$(BASE)classifier_predict.py
-EVALUATE=$(BASE)evaluate.py
-DISSIM=$(BASE)dissimilarities.py
-PLOT_WEIGHTS=$(BASE)plot_weights.py
-PR_TRAIN=$(BASE)propagate_train.py
-PLOT_CV=$(BASE)plot_propagator_cv_results.py
-PR_PREDICT=$(BASE)propagate_predict.py
-SUBSAMPLE=$(BASE)subsample.py -n200
+SRC_BASE=../../
+GENERATE=$(SRC_BASE)generate.py
+PLOT_SYNTHETIC=$(SRC_BASE)plot_synthetic.py
+FEATURES=$(SRC_BASE)features.py
+CL_TRAIN=$(SRC_BASE)classifier_train.py
+CL_PREDICT=$(SRC_BASE)classifier_predict.py
+EVALUATE=$(SRC_BASE)evaluate.py
+DISSIM=$(SRC_BASE)dissimilarities.py
+PLOT_WEIGHTS=$(SRC_BASE)plot_weights.py
+PR_TRAIN=$(SRC_BASE)propagate_train.py
+PLOT_CV=$(SRC_BASE)plot_propagator_cv_results.py
+PR_PREDICT=$(SRC_BASE)propagate_predict.py
+SUBSAMPLE=$(SRC_BASE)subsample.py -n200
 
 # Random seeds to produce the figure from the paper.
 SEED_CL_TRAIN=--random-seed=1448515783095693

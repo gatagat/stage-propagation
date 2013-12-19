@@ -148,7 +148,9 @@ def process(pred_filename, truth_filename, fprs=None, tprs=None, precisions=None
     sorted_class_labels = tsh.dict_values(labels, sorted_class_nums)
     cm = sklearn.metrics.confusion_matrix(truth, pred['pred'], labels=sorted_class_nums)
     acc = (np.diag(cm).sum() / float(np.sum(cm)))
-    label_acc = np.diagonal(cm).astype(np.float64) / np.sum(cm, axis=1).astype(np.float64)
+    label_cnts = np.sum(cm, axis=1).astype(np.float64)
+    label_acc = np.array(['nan']*len(label_cnts), dtype=np.float64)
+    label_acc[label_cnts > 0] = np.diagonal(cm).astype(np.float64)[label_cnts > 0] / label_cnts[label_cnts > 0]
     label_avg_acc = np.nansum(label_acc) / np.sum(np.isfinite(label_acc))
     tsh.plot_confusion_matrix(cm, labels=sorted_class_labels)
     plt.title('Sample accuracy: %.2f, label accuracy: %.2f' % (acc, label_avg_acc))
