@@ -1,12 +1,20 @@
 #Label propagation pipeline
-The pipeline consists of two blocks, a classification based on single samples, and a label propagation, which uses a similarity between the samples to denoise the labels assigned by the classifier. So the classifier provides unaries whereas the similarities provide the pairwise terms.
+The pipeline consists of two blocks, a classification based on single samples,
+and a label propagation, which uses a similarity between the samples to denoise
+the labels assigned by the classifier. So the classifier provides unaries
+whereas the similarities provide the pairwise terms.
+
+## Requirements
+
+- Install Python packages listed in python.requirements.
+- COIN LP (clp) from http://www.coin-or.org/projects/Clp.xml
 
 ## Data files
 
 ### List file and truth file
 
-Input data is specified in listfiles as CSV tables which have at least one column called ID.
-Minimal file should look like this:
+Input data is specified in listfiles as CSV tables which have at least one
+column called ID.  Minimal file should look like this:
 
 	ID
 	001
@@ -14,8 +22,10 @@ Minimal file should look like this:
 	003
 	...
 
-Meta information can be contained inside a header commented by `#` signs and encoded in YAML format.
-The interpretation of the individual CSV columns is entirely up to the different scripts, so a file with one image per sample can look like this:
+Meta information can be contained inside a header commented by `#` signs and
+encoded in YAML format.  The interpretation of the individual CSV columns is
+entirely up to the different scripts, so a file with one image per sample can
+look like this:
 
 	#path_prefix=/an/optional/path/prefix
 	ID	path
@@ -23,7 +33,9 @@ The interpretation of the individual CSV columns is entirely up to the different
 	002 dir2/file002.png
 	003 anotherdir/file003.png
 
-The file can contain any number of other columns. A truth file is just a list file with an additional _integer_ column identified by `truth` item in meta data. Labels are stored in meta data as well:
+The file can contain any number of other columns. A truth file is just a list
+file with an additional _integer_ column identified by `truth` item in meta
+data. Labels are stored in meta data as well:
 
 	#basedir=/an/optional/path/prefix
 	#truth_labels={ 1: 'classA', 2: 'classB' }
@@ -45,9 +57,11 @@ A feature file is a CSV table of the following form:
 	002	3.  .5  .1	...
 	003 2.	.7	-2	...
 
-Column `ID` should match with the corresponding list file, all other columns are considered to be features.
+Column `ID` should match with the corresponding list file, all other columns
+are considered to be features.
 
-A weights file is a feature file with a square matrix of weights saved as features and indexed by sample IDs:
+A weights file is a feature file with a square matrix of weights saved as
+features and indexed by sample IDs:
 
 	#methodname=...
 	ID	001	002	003	...
@@ -57,7 +71,8 @@ A weights file is a feature file with a square matrix of weights saved as featur
 
 ### Classifier file
 
-A pickled (serialized) bzip2-compressed Python dictionary with the following entries:
+A pickled (serialized) bzip2-compressed Python dictionary with the following
+entries:
 
 	features = { 'methodname': ..., 'argsfile': ... }
 	meta = ...
@@ -73,7 +88,8 @@ A prediction file is a truth file with additional columns:
 
 ### Propagator file
 
-A pickled (serialized) bzip2-compressed Python dictionary with the following entries:
+A pickled (serialized) bzip2-compressed Python dictionary with the following
+entries:
 
     propagator = { propagator_params... }
     meta = ...
@@ -86,7 +102,9 @@ A pickled (serialized) bzip2-compressed Python dictionary with the following ent
 
 ### features.py
 
-Computes features for all the input data. It contains a function `compute_features(method_name, method_args, data)` which based on `method_name`  calls the specific method for each sample in data:
+Computes features for all the input data. It contains a function
+`compute_features(method_name, method_args, data)` which based on `method_name`
+calls the specific method for each sample in data:
 
 	features = []
 	for sample in data:
@@ -97,11 +115,15 @@ Command-line interface:
 
 	features.py -m method_name -a argsfile -l listfile
 
-This runs feature extraction and saves output features for data listed specified in the listfiles into `features.csv`.
+This runs feature extraction and saves output features for data listed
+specified in the listfiles into `features.csv`.
 
 ### classifier_train.py
 
-Runs feature extraction, selects optimal hyper-parameters by cross-validation, learns the final model from all the data, and finally saves the model. It contains a function `train_classifier(features, truth)`. Prints out training evaluation.
+Runs feature extraction, selects optimal hyper-parameters by cross-validation,
+learns the final model from all the data, and finally saves the model. It
+contains a function `train_classifier(features, truth)`. Prints out training
+evaluation.
 
 Command-line interface:
 
@@ -131,7 +153,8 @@ It creates a prediction file `pred.csv`.
 
 ### weights.py
 
-Evaluates mutual similarities between all the sample pairs. Defines a function `compute_dissimilarities(method_name, method_args, data)`.
+Evaluates mutual similarities between all the sample pairs. Defines a function
+`compute_dissimilarities(method_name, method_args, data)`.
 
 Command-line interface:
 
@@ -139,11 +162,16 @@ Command-line interface:
 
 It creates a weights file `dissim.csv`.
 
-A `threshold` item in the arguments files defines how are the similarities thresholded. These similarities are used to setup edge weights for the label propagation, so thresholding makes the used graph sparse.
+A `threshold` item in the arguments files defines how are the similarities
+thresholded. These similarities are used to setup edge weights for the label
+propagation, so thresholding makes the used graph sparse.
 
 ### propagate_train.py
 
-Searches for optimal hyper-parameters defined in an arguments file. This having at least partial truth for a set of listfiles, predictions from an already learned classifier on the whole listfiles, and dissimilarities for all the listfiles. Defines a function `train(method_name, method_args, data)`.
+Searches for optimal hyper-parameters defined in an arguments file. This having
+at least partial truth for a set of listfiles, predictions from an already
+learned classifier on the whole listfiles, and dissimilarities for all the
+listfiles. Defines a function `train(method_name, method_args, data)`.
 
 Command-line interface:
 
@@ -158,7 +186,9 @@ Arguments file can look like this:
 
 ### propagate_predict.py
 
-Propagates labels according to predictions for different samples and according to the edge weights computed by `dissimilarities.py`. Defines a function `propagate(method_name, method_args, predictions, dissim)`.
+Propagates labels according to predictions for different samples and according
+to the edge weights computed by `dissimilarities.py`. Defines a function
+`propagate(method_name, method_args, predictions, dissim)`.
 
 Command-line interface:
 
