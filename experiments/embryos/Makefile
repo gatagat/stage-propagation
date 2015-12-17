@@ -53,7 +53,7 @@ clean:
 	rm -f *.svg 2>/dev/null
 	rm -f *.html *.txt 2>/dev/null
 	rm -f *-predictions.csv.gz *-propagated.csv.gz 2>/dev/null
-        rm -f *-feats.csv.gz *-truth.csv *-data.csv *-dissim.csv.gz *-distances.dat 2>/dev/null
+	rm -f *-feats.csv.gz *-truth.csv *-data.csv *-dissim.csv.gz *-distances.dat 2>/dev/null
 
 local-images: $(PR_ALL_DATA:%=%-data.csv)
 	$(LOCAL_COPY) -r ~/vt_project/Segmentation/Fine/MetaSys/ -o ../images/ $^

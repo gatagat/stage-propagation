@@ -71,7 +71,7 @@ def read_listfile(filename):
     return meta, data
 
 
-def write_listfile(filename, data, **kwargs):
+def write_listfile(filename, data, column_names=None, **kwargs):
     """
     Writes a general list file.
 
@@ -84,8 +84,10 @@ def write_listfile(filename, data, **kwargs):
     -----------
     filename: str
         Output filename.
-    data: recarray
+    data: recarray, or list of dicts
         Tabular data to be stored as a CSV. One of the columns has to be called 'id'.
+    column_names: list of strings (excl. 'id')
+        Directly specifying column names to write. Allows selection of features.
     kwargs: dict
         Meta data.
     """
@@ -95,7 +97,8 @@ def write_listfile(filename, data, **kwargs):
         open_fn = open
     with open_fn(filename, 'w') as f:
         _dump_meta(f, kwargs)
-        column_names = [n for n in data.dtype.names if n != 'id']
+        if column_names is None:
+            column_names = [n for n in data.dtype.names if n != 'id']
         f.write('\t'.join(['id'] + column_names) + '\n')
         for sample in data:
             f.write(str(sample['id']) + '\t' + '\t'.join([str(sample[n]) for n in column_names]) + '\n')
